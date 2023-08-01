@@ -1,6 +1,7 @@
 /* 
 Fixed GitHub Issues that are implemented in this JS code: 
 #11 : Option to lock objects in hidden state (bar, beam, circle, dashpot, fix1, fix12, fix123, fix13, polygon, q, rope, springc, springt, wall)
+#12 : Make the beam object clickable
 #13 : Suppress infobox at "rot" points
 #28 : Move "force" by dragging the vector
 #30 : "force": Prevent forces to have zero length
@@ -214,7 +215,7 @@ class beam {
      var bneu = board.create('curve',[
        [x+dy*c,x+dx+dy*c,x+dx-dy*c,x-dy*c,x+dy*c], 
        [y-dx*c,y+dy-dx*c,y+dy+dx*c,y+dx*c,y-dx*c] ], 
-       { strokeWidth:0 }
+       { strokeWidth:0, hasInnerPoints:true }
      );
      // snap points
      board.create('point',this.p[0], silentPStyle );
