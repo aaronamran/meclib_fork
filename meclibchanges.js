@@ -1001,19 +1001,39 @@ class grid {
     var fx = 1, fy = 1;
     if (data[8]) {fx = data[8][0]; fy = data[8][1]; xscale = fx; yscale = fy };
     if (data[9]) {dpx = data[9][0]; dpy = data[9][1] };
-    // logics of container sizing and grid scaling has changed between 1.2.1 and 1.3.2
-    if (isNewerVersion ('1.3.1', JXG.version)) {
-      board.resizeContainer(pix*Math.abs(xmax-xmin), pix*Math.abs(ymax-ymin),false,true); 
-      board.setBoundingBox([xmin, ymax, xmax, ymin ], true)
-    } else {
-      board.setBoundingBox([xmin, ymax, xmax, ymin ]);
-      board.resizeContainer(pix*Math.abs(xmax-xmin), pix*Math.abs(ymax-ymin)); 
+    var width = pix*Math.abs(xmax-xmin)	
+    var height = pix*Math.abs(ymax-ymin)	
+    // logics of container sizing and grid scaling has changed between 1.2.1 and 1.3.2 and in 2023	
+    try {	
+      if (stack_js) {	
+        // Stack 2023	
+		// JSXGraph box sizing and coordinate system	
+        board.resizeContainer(width, height); 	
+        board.setBoundingBox([xmin, ymax, xmax, ymin ])	
+        // sizing the wrapper div	
+        document.getElementById(divid).parentElement.style.width = width.toFixed(0)+"px";	
+        document.getElementById(divid).parentElement.style.height = height.toFixed(0)+"px";	
+		// sizing the iframe	
+        stack_js.resize_containing_frame((width+3).toFixed(0)+"px", (height+3).toFixed(0)+"px");	
+      }	
+    } catch (error) {	
+      if (error instanceof ReferenceError) {	
+        // older	
+        if (isNewerVersion ('1.3.1', JXG.version)) {	
+          board.resizeContainer(width, height,false,true); 	
+          board.setBoundingBox([xmin, ymax, xmax, ymin ], true)	
+        } else {	
+          board.setBoundingBox([xmin, ymax, xmax, ymin ]);	
+          board.resizeContainer(width, height); 	
+        }	
+      }
     }
     // convenience units
     a = 16/pix; 
     pxunit = 1/pix;
     //labelshift = 0.2*a;
     //if (data[1] || data[2]) {board.removeGrids()};
+    // Axes specification
     var labelopt;
     if (data[1]) { 
       if (xmin<xmax) {labelopt = {position: 'rt', offset: [-5, 12] } } 
