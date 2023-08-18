@@ -5,7 +5,7 @@ Fixed GitHub Issues that are implemented in this JS code:
 #13 : Suppress infobox at "rot" points
 #28 : Move "force" by dragging the vector
 #30 : "force": Prevent forces to have zero length
-#35 : Make toStack() more robust
+#35 : Make toStack() more robust (cleanupName())
 #37 : Grid lines to the background
 
 Animated the following objects:
@@ -23,7 +23,7 @@ Animated the following objects:
 
 // https://github.com/mkraska/meclib/wiki
 // version info
-const versionText= "JXG "+JXG.version+" Meclib 2023 06 09";
+const versionText= "JXG "+JXG.version+" Meclib 2023 08 16";
 const highlightColor = "orange";
 const movableLineColor = "blue";
 const loadColor = "blue";
@@ -52,6 +52,8 @@ JXG.Options.text.parse = false;
 JXG.Options.label.useMathJax = true;
 JXG.Options.label.offset = [0, 0];
 JXG.Options.label.anchorY = 'middle';
+// suppress automatic labels
+JXG.Options.point.name = ""; 
 // highlighting is activated explicitly for interactive objects
 JXG.Options.curve.highlight = false;
 JXG.Options.label.highlight = false;
@@ -78,7 +80,7 @@ const normalStyle = { strokeWidth: 2, strokeColor: 'black', lineCap: 'round' };
 // helper line
 const thinStyle = { strokeWidth: 1, strokeColor: 'black', lineCap: 'round' };
 // hatch style, must be a function because depending on pxunit
-const hatchStyle = function () { return {fixed: true, width:4*pxunit , frequency:4*pxunit, angle:45*deg2rad, layer:8 } };
+const hatchStyle = function () { return {fixed: true, width:5*pxunit , frequency:5*pxunit, angle:45*deg2rad, layer:8, strokeColor:'black' } };
 
 const board = JXG.JSXGraph.initBoard(divid, {
   boundingbox: [-5, 5, 5, -5], //default values, use "grid" to customize
@@ -972,6 +974,29 @@ class forceGen {
   name(){  return "0" }
 }
 
+// [ "frame", "", [ Array of ccordinates ], tension]
+class frame {
+	constructor(data) {
+  	this.d = data;
+    if(data[3]){
+    	this.t = data[3];
+    } else{
+    	this.t = 3;
+    }
+    this.fr = board.create('metapostspline', [data[2], {
+		tension: this.t,  // <--- Je höher desto kantiger
+  	isClosed: true
+		}], {
+		strokeColor: 'grey',
+  		strokeWidth: 2,
+  		dash: 2,
+  		points: {visible: false}
+});
+  }
+  data() { return this.d }
+  name(){  return "0" }
+}
+
 // grid control object: [ "grid", "xlabel", "ylabel",  xmin, xmax, ymin, ymax, pix ]
 // grid control object: [ "grid", "xlabel", "ylabel",  xmin, xmax, ymin, ymax, pix, [fx, fy] ]
 // newer version of class grid to fix grid lines issue
@@ -1858,39 +1883,40 @@ function init() {
       case "angle":     objects.push(new angle(m)); break;
       case "angle1":    objects.push(new angle(m)); break;
       case "angle2":    objects.push(new angle(m)); break;
-      case "bar":	    objects.push(new bar(m)); break;
-      case "beam":	    objects.push(new beam(m)); break;
+      case "bar":	objects.push(new bar(m)); break;
+      case "beam":	objects.push(new beam(m)); break;
       case "circle":	objects.push(new circle(m)); break;
       case "circle2p":	objects.push(new circle2p(m)); break;
       case "crosshair":	objects.push(new crosshair(m)); break;
       case "dashpot":	objects.push(new dashpot(m)); break;
-      case "dim": 		objects.push(new dim(m)); break;
-      case "dir": 		objects.push(new dir(m)); break;
-      case "disp": 		objects.push(new disp(m)); break;
-      case "fix1": 	  	objects.push(new fix1(m)); break;
+      case "dim": 	objects.push(new dim(m)); break;
+      case "dir": 	objects.push(new dir(m)); break;
+      case "disp": 	objects.push(new disp(m)); break;
+      case "fix1": 	objects.push(new fix1(m)); break;
       case "fix12": 	objects.push(new fix12(m)); break;
       case "fix123": 	objects.push(new fix123(m)); break;
       case "fix13": 	objects.push(new fix13(m)); break;
       case "force": 	objects.push(new force(m)); break;
       case "forceGen":  objects.push(new forceGen(m)); break;
+      case "frame": 	objects.push(new frame(m)); break;
       case "grid":  	objects.push(new grid(m)); break;
       case "label":   	objects.push(new label(m)); break;
-      case "line": 		objects.push(new line(m)); break
+      case "line": 	objects.push(new line(m)); break
       case "line2p": 	objects.push(new line2p(m)); break
-      case "mass": 		objects.push(new mass(m)); break;     
+      case "mass": 	objects.push(new mass(m)); break;     
       case "moment":  	objects.push(new moment(m)); break;
       case "momentGen":	objects.push(new momentGen(m)); break;
       case "node":      objects.push(new node(m)); break;
       case "point":     objects.push(new point(m)); break;
       case "polygon":   objects.push(new polygon(m)); break;
-      case "q":  	    objects.push(new q(m)); break;
+      case "q":  	objects.push(new q(m)); break;
       case "rope":      objects.push(new rope(m)); break;
       case "rot":       objects.push(new rot(m)); break;
       case "spline":  	objects.push(new spline(m)); break;
       case "springc":   objects.push(new springc(m)); break;
       case "springt":  	objects.push(new springt(m)); break;
-      case "wall": 		objects.push(new wall(m)); break;
-	  default: console.log("Unknown object",m);
+      case "wall": 	objects.push(new wall(m)); break;
+      default: console.log("Unknown object",m);
     }
   }
 }
@@ -1954,6 +1980,7 @@ function cleanUp() {
     if (d[d.length-1] == 'deleted') {objects.splice(i,1); i--;}
   }
 }
+
 // math helper functions
 function rect(r,alpha) { return [ r*Math.cos(alpha), r*Math.sin(alpha) ] }
 function polar(a) { return [ Math.sqrt( a[0]**2 + a[1]**2 ), Math.atan2(a[1], a[0]) ] }
@@ -1962,17 +1989,17 @@ function mult(f,a) { return [ a[0]*f, a[1]*f ] }
 function plus(a,b) { return [ a[0]+b[0], a[1]+b[1] ] }
 function minus(a,b) { return [ a[0]-b[0], a[1]-b[1] ] }
 function dist(a,b) { return Math.sqrt( (a[0]-b[0])**2 + (a[1]-b[1])**2 ) }
+
 // function for string conversion
 // converts whitespace to stars, avoids empty strings
 // original toSTACK function
-/*
 function toSTACK(str) { 
   var st = str.replace(/\s+/g, "*");
   if (st === "") {st = "NONAME"}
   return st
 }
-*/
 
+/*
 // new toSTACK function
 function toSTACK(str) {
   if (str.includes("_")) {
@@ -2005,6 +2032,7 @@ function toSTACK(str) {
     console.log("Please enter a valid input.")
   }
 }
+*/
 // toSTACK() test
 //let input = "";
 //let input = "q_0*3a";
