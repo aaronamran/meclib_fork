@@ -1370,43 +1370,50 @@ class q {
 // negative r values select the tangent point on the left side from the line p1-p2
 class rope {
   constructor(data) {
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "locked"}
+    if (typeof(data[data.length - 1]) == 'string') {this.state = data.pop()} else {this.state = "SHOW"}
     this.d = data;
-    const v = minus( data[4], data[2] );
+    const v = minus(data[4], data[2]);
     //const dx = data[4][0]-data[2][0];
     //const dy = data[4][1]-data[2][1];
-    const [le, a0] = polar( v );
+    const [le, a0] = polar(v);
     //const a0 = Math.atan2(dy,dx);
     //const le = Math.sqrt(dx**2+dy**2);
-    const r1 = data[3];
-    const r2 = data[5];
+    const r1 = data[3], r2 = data[5];
     const a1 = Math.acos((r1-r2)/le);
-    const p1 = plus( data[2], rect( r1, a0-a1) );
-    const p2 = plus( data[4], rect( r2, a0-a1) ) 
-    this.l = board.create('segment', [ p1,p2 ],
-      {name: data[1], layer: defaultMecLayer, withLabel:true,
-       ...normalStyle, label:{offset:[0,8],autoPosition:false}});
-    targets.push(this.l);
     // snap targets
-    this.p1 = board.create('point', p1, {name: '', ...silentPStyle } );
-    this.p2 = board.create('point', p2, {name: '', ...silentPStyle } );
+    this.p1 = board.create('point', data[2], {name:'p1', visible:false});
+    this.p2 = board.create('point', data[4], {name:'p2', visible:false});
+    // rope position adjustment and creation
+    this.pm = board.create('midpoint', [this.p1, this.p2], {name:'pm', visible:false});
+    this.c1 = board.create('circle', [this.p1, r1], {visible:false});
+    this.c2 = board.create('circle', [this.p2, r2], {visible:false});
+    this.cm = board.create('circle', [this.pm, this.p1], {visible:false});
+    this.c3 = board.create('circle', [this.p1, function() {
+    if(r1 > r2) {return r1 - r2;} else {return r2 + r1;}}], {strokeWidth:'1px', visible:false});
+    this.i1 = board.create('intersection', [this.cm, this.c3], {name:'i1', visible:false});
+    this.i2 = board.create('otherintersection', [this.cm, this.c3, this.i1], {name:'i2', visible:false});
+    this.l1 = board.create('line', [this.p1, this.i2], {visible:false});
+    this.segm = board.create('segment', [this.i2, this.p2], {visible:false});
+    this.i3 = board.create('intersection', [this.c1, this.l1], {name:'i3', visible:false});
+    const p1 = plus(data[2], rect(r1, a0-a1)), p2 = plus(data[4], rect(r2, a0-a1)); 
+    this.lp = board.create('parallel', [this.i2,this.p2,this.i3], {visible:false});
+    this.i4 = board.create('intersection', [this.c2, this.lp], {name:'i4', visible:false});
+    this.l = board.create('segment', [this.i3,this.i4], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}});
+    targets.push(this.l);
     // implement state switching
-    this.obj = [ this.l, this.l.label ]; 
+    this.obj = [this.l, this.l.label];  
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "locked") { makeSwitchable(this.l, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
-
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.l, this); break;
+    case 'hide': hide(this); makeSwitchable(this.l, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     this.loads = []
   }
   data(){ var a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
-  hasPoint(pt) {return isOn(pt,this.l) && 
-    JXG.Math.Geometry.distPointLine(
-      [1,pt.X(),pt.Y()], this.l.stdform) < tolPointLine} 
+  hasPoint(pt) {return isOn(pt,this.l) && JXG.Math.Geometry.distPointLine([1,pt.X(),pt.Y()], this.l.stdform) < tolPointLine} 
 }
 
 //rot
@@ -2017,22 +2024,27 @@ function toTEX(str) {
 // If there is more than one character before the end or before the first subscript, then the name is modified.
 // https://jsfiddle.net/0pzeu68g/1/
 function cleanupName(str) {
+  console.log('original string input is here: ' + str);
   let strList = str.split(/\s+|\*/);
   let out =""
-  console.log(strList)
+  console.log("here is strList: " + strList)
+  
   strList.forEach(function(st) {
-    console.log(st);
-    var pos = st.search("_") 
-    if (st.length>1 && pos>1) { 
-      // remove underscores at wrong places
-      st = st.replace(/_/g, '')
-      pos = -1}
-    if (st.length>1 && pos===-1) { st = st.substring(0, 1) + "_" + st.substring(1);} // insert an underscore if string is longer than one character
-    out = out+st+" "
+  console.log("here is st: " + st);
+  var pos = st.search("_") 
+  if (st.length>1 && pos>1) { 
+    // remove underscores at wrong places
+    st = st.replace(/_/g, '')
+    pos = -1}
+  if (isNaN(st[0]) == true && st.length>1 && pos===-1) { st = st.substring(0, 1) + "_" + st.substring(1);} // insert an underscore if string is longer than one character
+  else if (isNaN(st[0]) == false && st.length>1 && pos===-1) { st = st.substring(0, 1) + " " + st.substring(1);}
+  // should output have * or just empty space? since toTEX() replaces * with empty spaces
+  out = out + st + " "
   });
   out = out.slice(0, -1); // renove trailing space
   return out
-}
+  }
+
 // functions for proximity check (Allfred Wassermann, 2022-12-13)
 function isOn(pt, po) {return pt.isOn(po, tolPointLine) }	
 function targetName(obj) {if (obj.loads[0]) {return '['+obj.loads+']'} else {return '"'+obj.state+'"' } } 
