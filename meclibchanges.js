@@ -8,17 +8,7 @@ Fixed GitHub Issues that are implemented in this JS code:
 #35 : Make toStack() more robust (cleanupName())
 #37 : Grid lines to the background
 
-Animated the following objects:
-- circle
-- fix1, fix12, fix123, fix13
-- label
-- mass
-- node
-- point
-- polygon
-- rot
-- springc
-- springt
+https://github.com/mkraska/meclib/wiki/Moving-objects-by-scripts
 */
 
 // https://github.com/mkraska/meclib/wiki
