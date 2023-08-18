@@ -110,47 +110,51 @@ board.highlightInfobox = function(x, y , el) {
 class angle {
  constructor(data) {
    this.d = data.slice(0); //copy
-   // base line
-   this.p1 = board.create('point',data[2], silentPStyle );
-   this.p2 = board.create('point',data[3], silentPStyle );
-   this.line = board.create('segment', [this.p1, this.p2], {
-     withlabel:false, ...thinStyle });
+   // base line		// silentPStyle
+   this.p1 = board.create('point',data[2],{size:0, name:''}); // silentPStyle
+   this.p3 = board.create('point',data[3], {size:0, name:''} ); // silentPStyle
+   this.line = board.create('segment', [this.p1, this.p3], {withlabel:false, ...thinStyle });
    // second line
    const a0 = this.line.getAngle();
    const le = this.line.L();
    const a1 = a0+data[5]*deg2rad;
-   //console.log(a0*rad2deg, a1*rad2deg);
-   this.p3 = board.create('point', plus( XY(this.p1), rect(le,a1) ), silentPStyle );
-   this.l2 = board.create('segment', [this.p1, this.p3], {
-     withlabel:false, ...thinStyle });
+   this.p2 = board.create('point', plus(XY(this.p1), rect(le,a1) ), {size:0, name:''});	// silentPStyle
+   this.l2 = board.create('segment', [this.p1, this.p2], {withlabel:false, ...thinStyle });
    // arc with arrows
-   this.p4 = board.create('point', plus( XY(this.p1), rect(data[4],a0) ), silentPStyle );
+   this.p4 = board.create('point', plus( XY(this.p1), rect(data[4],a0) ), {visible:false, name:'p4'}); // silentPStyle
+   console.log('angle p4 is here!! ' + data[4]);
    if (data[0] == "angle" ) {
-     this.arc = board.create('minorArc', [this.p1, this.p4, this.p3], 
+     this.arc = board.create('minorArc', [this.p1, this.p4, this.p2], 
        { ...thinStyle } ) }
    if (data[0] == "angle1" ) { 
-     this.arc = board.create('minorArc', [this.p1, this.p4, this.p3], 
+     this.arc = board.create('minorArc', [this.p1, this.p4, this.p2], 
        { ...thinStyle, lastArrow:{type: 1, size: 6}})}
    if (data[0] == "angle2" ) {
-     this.arc = board.create('minorArc', [this.p1, this.p4, this.p3], 
+     this.arc = board.create('minorArc', [this.p1, this.p4, this.p2], 
        { ...thinStyle, firstArrow:{type: 1, size: 6},lastArrow:{type: 1, size: 6}})}
-        
    // label
    const al = (a0+a1)/2; // angular position of label
    if (data[1] == ".") {
      const rl = data[4]*0.6;
-     this.p5 = board.create('point', plus( XY(this.p1), rect(rl,al) ), {
+     this.p5 = board.create('point', plus(XY(this.p1), rect(rl,al) ), {
        name:"" , showInfobox:false, 
        fillcolor:'black',strokeColor:'black',size:0.5, strokeWidth:0}); 
    }
    else {
      const rl = data[4]+10*pxunit;
-     this.p5 = board.create('point', plus( XY(this.p1), rect(rl,al) ), { 
-       name:toTEX(data[1]), showInfobox:false, size:0, label:{offset:[-6,0]}}); 
+     this.p5 = board.create('point', plus(XY(this.p1), rect(rl,al)), {name:toTEX(data[1]), showInfobox:false, size:0, label:{offset:[-6,0]}}); 
    }
+    // Enable object animation
+    this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
+    const diffX = this.p1.X() - this.p0.X();
+		const diffY = this.p1.Y() - this.p0.Y();
+    const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
+		t1.bindTo(this.p0);
+		const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
+		t2.bindTo([this.p2, this.p3, this.p4, this.p5]); 
  }
- data() { return this.d }
- name() { return '"'+this.d[1]+'"' }
+ data() {return this.d}
+ name() {return '"'+this.d[1]+'"'}
 }
 // Fachwerkstab
 class bar {
@@ -159,24 +163,32 @@ class bar {
      else {this.state = "locked"}
    this.d = data.slice(0);
    // line
-   this.p1 = board.create('point',data[2],{withlabel:false, ...nodeStyle});
-   this.p2 = board.create('point',data[3],{withlabel:false, ...nodeStyle});
-   this.line = board.create('segment', [this.p1, this.p2], {
-     withlabel:false, ...barStyle});  
+   this.p1 = board.create('point',data[2],{withlabel:false, ...nodeStyle, fixed:false});
+   this.p2 = board.create('point',data[3],{withlabel:false, ...nodeStyle, fixed:false});
+   this.l = board.create('line', [this.p1, this.p2], {visible:false});
+   this.mp = board.create('midpoint', [this.p1, this.p2], {name:'mp', visible:false});
+   this.line = board.create('segment', [this.p1, this.p2], {withlabel:false, ...barStyle});  
    targets.push(this.line);
    // label
    const alpha = this.line.getAngle()+90*deg2rad;
-   this.label = board.create('text', plus(  mult( 0.5, plus( XY(this.p1), XY(this.p2) ) ), rect(11*pxunit, alpha) ).concat(data[1]), {
-     anchorX:'middle', anchorY:'middle' });
-    // implement state switching
-    this.obj = [ this.p1, this.p2, this.line, this.label ];
-    // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
-    this.loads = [];
-    if (this.state != "locked") { makeSwitchable(this.line, this) }
+   this.lp = board.create('point', plus(  mult( 0.5, plus( XY(this.p1), XY(this.p2) ) ), rect(11*pxunit, alpha)), {visible:false});
+   const r = Math.sqrt((this.lp.X()-this.mp.X())**2 + (this.lp.Y()-this.mp.Y())**2);
+   this.perpl = board.create('perpendicular', [this.mp, this.l], {visible:false});
+   this.lc = board.create('circle', [this.mp, r], {visible:false});
+   this.int1 = board.create('intersection', [this.perpl, this.lc], {name:'int1', visible:false});
+   this.int2 = board.create('otherintersection', [this.perpl, this.lc, this.int1], {visible:false});
+   let x = () => this.int2.X(), y = () => this.int2.Y();
+   this.label = board.create('text', [x, y, data[1]], {anchorX:'middle', anchorY:'middle'});
+   // implement state switching
+   this.obj = [this.p1, this.p2, this.line, this.label];
+   switch (this.state) {
+   case 'show': show(this); makeSwitchable(this.line, this); break;
+   case 'hide': hide(this); makeSwitchable(this.line, this); break;
+   case 'SHOW': SHOW(this); break;
+   case 'HIDE': HIDE(this); break;
+    } 
+   // state init
+   this.loads = [];
   }
   hasPoint(pt) { 
    return isOn(pt,this.line) && JXG.Math.Geometry.distPointLine([1,pt.X(),pt.Y()], this.line.stdform) < tolPointLine}
@@ -254,47 +266,42 @@ class circle {
     this.d = data.slice(0); //make a copy
     if (data[5]) {this.state = data[5]} else {this.state = "SHOW"}
     if (data[4]) {this.angle = data[4]*deg2rad} else {this.angle = 0} // pop the angle for the label
-    this.p1 = board.create('point', data[2], {visible:true});
+    this.p1 = board.create('point', data[2], {visible:true, size:0});
     // specify circle radius - check if data[3] is an array of coordinates or radius from midpoint
     const theta = Math.atan2(this.p1.Y(),this.p1.X());
     if (typeof(data[3]) == 'number') {this.p2 = board.create('point', [this.p1.X() + data[3] * Math.cos(theta), this.p1.Y() + data[3] * Math.sin(theta)], {visible:false})}
      else {this.p2 = board.create('point', data[3], {visible:false});}
     // circle
-    this.c = board.create('circle', [ this.p1, this.p2 ], {
-      opacity: true, fillcolor:'lightgray', hasInnerPoints:true, 
-      strokeWidth: normalStyle.strokeWidth, 
-      strokeColor: normalStyle.strokeColor});
+    this.c = board.create('circle', [this.p1,this.p2], {opacity: true, fillcolor:'lightgray', hasInnerPoints:true, strokeWidth: normalStyle.strokeWidth, strokeColor: normalStyle.strokeColor});
     this.obj = [this.c];
     // arrow and label if name is not empty
     if (data[1] != '') {
       var dir = 1;
       if (this.angle < 0) {dir = -1}
       const r = this.c.Radius();
-      //      console.log(dir);
+      // console.log(dir);
       this.p3 = board.create('point',plus(XY(this.p1), rect(r+dir*16*pxunit, this.angle)), {visible:false} );
-      this.p4 = board.create('point',plus( XY(this.p1), rect(r, this.angle)), {visible:false} );
-      this.a = board.create('arrow', [ this.p3, this.p4], thinStyle);
+      this.p4 = board.create('point',plus(XY(this.p1), rect(r, this.angle)), {visible:false} );
+      this.a = board.create('arrow', [this.p3, this.p4], thinStyle);
       // label
       this.p = board.create('point', plus( XY(this.p1), rect(r+dir*24*pxunit, this.angle)),
-      {name:toTEX(data[1]), ...centeredLabelStyle }); 
+      {name:toTEX(data[1]), ...centeredLabelStyle});
       this.obj.push( this.a, this.p.label );
     }
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
     const diffX = this.p1.X() - this.p0.X();
-		const diffY = this.p1.Y() - this.p0.Y();
+    const diffY = this.p1.Y() - this.p0.Y();
     const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-		t1.bindTo(this.p0);
-		const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-		t2.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p, this.p.label]); 
-    //this.p1.setAttribute({fixed:false});
-    //this.p1.moveTo([3, 7], 2000);
-
+    t1.bindTo(this.p0);
+    const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
+    t2.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p]); 
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.c, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.c, this); break;
+    case 'hide': hide(this); makeSwitchable(this.c, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     this.loads = []
   }
   hasPoint(pt) {return isOn(pt,this.c)} 
@@ -389,47 +396,44 @@ class dashpot {
   constructor(data){
     // Parameter handling
     if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "locked"}
+      else {this.state = "SHOW"}
     this.d = data.slice(0); //make a copy
-    var x = this.d[2][0];
-    var y =  this.d[2][1];
-    var dx = (this.d[3][0]-x);
-    var dy = (this.d[3][1]-y);
-    var l = Math.sqrt(dx**2+dy**2);
-    var r;
-    if (data.length >4 ) {r = data[4] } else {r = 6*pxunit}
-    if (data.length >5 ) {this.off = data[7]} else {this.off = r+10*pxunit}
-    var c = r/l;
-    // start point
-    var xc = x+0.5*dx, yc = y+0.5*dy;
-    var dlx = c*dx, dly = c*dy, dqx = -c*dy, dqy = c*dx;    
-    var px = [x, xc, NaN, xc+dqx, xc-dqx, NaN,
-      xc+dqx-dlx, xc+dqx+dlx, xc-dqx+dlx, xc-dqx-dlx, NaN,
-      xc+dlx, x+dx];
-    var py = [y, yc, NaN, yc+dqy, yc-dqy, NaN,
-      yc+dqy-dly, yc+dqy+dly, yc-dqy+dly, yc-dqy-dly, NaN,
-      yc+dly, y+dy];
-    px.push(x+dx);
-    py.push(y+dy);
-    this.c = board.create('curve',[ px, py ], normalStyle );
+    this.p1 = board.create('point', this.d[2], {name:'p1', fixed:true, visible:false});
+    this.p2 = board.create('point', this.d[3], {name:'p2', fixed:true, visible:false});
+    let x = () => this.p1.X(), y = () => this.p1.Y();
+    let dx = () => (this.p2.X()-x()), dy = () => (this.p2.Y()-y());
+    let l = () => Math.sqrt(dx()**2+dy()**2);
+    if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
+    if (data.length >5 ) {this.off = data[5]} else {this.off = (this.r)+10*pxunit} // check data[7]
+    let c = () => this.r/l();
+    let xc = () => x()+0.5*dx(), yc = () => y()+0.5*dy();
+    let dlx = () => c()*dx(), dly = () => c()*dy(), dqx = () => -c()*dy(), dqy = () => c()*dx();   
+    this.c = board.create('curve',[[0],[0]], {hasInnerPoints:true, ...normalStyle} );
+    this.c.updateDataArray = function() {
+    this.dataX = [x(), xc(), NaN, xc()+dqx(), xc()-dqx(), NaN,
+      xc()+dqx()-dlx(), xc()+dqx()+dlx(), xc()-dqx()+dlx(), xc()-dqx()-dlx(), NaN,
+      xc()+dlx(), x()+dx()];
+    this.dataY = [y(), yc(), NaN, yc()+dqy(), yc()-dqy(), NaN,
+      yc()+dqy()-dly(), yc()+dqy()+dly(), yc()-dqy()+dly(), yc()-dqy()-dly(), NaN,
+      yc()+dly(), y()+dy()];
+    }; 
     // snap points
-    this.p1 = board.create('point',this.d[2], silentPStyle );
-    this.p2 = board.create('point',this.d[3], silentPStyle );
     this.s = board.create('segment', [this.p1,this.p2],{strokeWidth:0});
     targets.push(this.s);
     // label
-    this.l = board.create('point',[xc-dy/l*this.off, yc+dx/l*this.off], {    
-      name:toTEX(data[1]), ...centeredLabelStyle });
+    let labelX = () => xc()-dy()/l()*this.off, labelY = () => yc()+dx()/l()*this.off;
+    this.l = board.create('point',[labelX,labelY], {name:toTEX(data[1]), ...centeredLabelStyle});
     // logging
-    console.log("dasphot", data[1], data[2], data[3], r, this.off);   
+    console.log("dasphot", data[1], data[2], data[3], this.r, this.off);   
     // implement state switching
     this.obj = [ this.c, this.l.label ];
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "locked") { makeSwitchable(this.c, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.c, this); break;
+    case 'hide': hide(this); makeSwitchable(this.c, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     this.loads = []
   }
   data(){ var a = this.d.slice(0); a.push(this.state); return a}
@@ -438,39 +442,105 @@ class dashpot {
     JXG.Math.Geometry.distPointLine(
       [1,pt.X(),pt.Y()], this.s.stdform) < tolPointLine} 
 }
+
 // linear dimension ["dim", "name", [x1,y1], [x2,y2], d]
 class dim {
  constructor(data) {
    this.d = data; 
    const d = data[4];
-   const vd = minus( data[3], data[2]);
+   const vd = minus(data[3], data[2]);
    const [le, a0] = polar(vd);
-   const vn = rect( 1, a0+90*deg2rad )
-   const v1 = plus( data[2], mult( d, vn ) );
-   const v2 = plus( v1, vd );
-   const vc = mult( 0.5, plus( v1, v2));
-   // baseline
-   this.bl = board.create('arrow', [ v1, v2], {
-     name: '', ...thinStyle, 
-     firstArrow: { type: 1, size: 6 }, lastArrow: { type: 1, size: 6 }});
+   const vn = rect(1, a0+90*deg2rad);	// ao is used here
+   const vmult = mult(d, vn);
+   this.p01 = board.create('point', [data[2][0] + vmult[0], data[2][1] + vmult[1]], {fixed:true, visible:false, name:'p01'});
+   this.p02 = board.create('point', [data[2][0] + vmult[0] + vd[0], data[2][1] + vmult[1] + vd[1]], {fixed:false, visible:false, name:'p02'});
+   this.mp1 = board.create('midpoint', [this.p01, this.p02], {name:'mp1', visible:false});
+   
+   // p01, p02 are the initial points, p1 and p2 are based on these 2 points, in turn, pv1 and pv2 are based on p1 and p2
+   let p01x = this.p01.X(), p01y = this.p01.Y(), p02x = this.p02.X(), p02y = this.p02.Y();
    // perpendicular lines
    var da = 5*pxunit;
    var di = da;
-   if (d !=0  ) {di=d};
-   if (d<0) {di=d;da=-da};
-   this.hl1 = board.create('segment', 
-     [ plus (v1, mult( -di, vn)), plus (v1, mult( da, vn)) ], 
-     {name: '', ...thinStyle});
-   this.hl2 = board.create('segment', 
-     [ plus (v2, mult( -di, vn)), plus (v2, mult( da, vn)) ],
-     {name: '', ...thinStyle});
+   if (d !=0  ) {di=d}
+   if (d<0) {di=d;da=-da}
+   let negdivn = mult(-di,vn), posdavn = mult(da, vn);
+
+   this.p1 = board.create('point', [p01x + negdivn[0], p01y + negdivn[1]], {visible:false, name:'p1', fixed:true});
+   this.p2 = board.create('point', [p02x + negdivn[0], p02y + negdivn[1]], {visible:false, name:'p2', fixed:true});
+   this.l = board.create('line', [this.p1, this.p2], {visible:false});
+   let p1x = () => this.p1.X(), p1y = () => this.p1.Y(), p2x = () => this.p2.X(), p2y = () => this.p2.Y();
+
+   this.perpl1 = board.create('perpendicular', [this.l, this.p1], {visible:false});
+   this.perpl2 = board.create('perpendicular', [this.l, this.p2], {visible:false});
+   const vd1 = minus(XY(this.p2), XY(this.p1));
+   const [le1, a01] = polar(vd1);
+   const vn1 = rect(1, a01+90*deg2rad);	// ao is used here
+   const vmult1 = mult( d, vn1 );
+   // perpendicular lines
+   this.p3 = board.create('point', [p01x + posdavn[0], p01y + posdavn[1]], {visible:false, name:'p3', fixed:false});
+   this.p4 = board.create('point', [p02x + posdavn[0], p02y + posdavn[1]], {visible:false, name:'p4', fixed:false});
+   this.hl1 = board.create('segment', [this.p1, this.p3], {visible:false});
+   this.hl2 = board.create('segment', [this.p2, this.p4], {visible:false});
+   this.pv1 = board.create('glider', [p01x, p01y, this.hl1], {fixed:true, visible:false, name:'pv1'});
+   this.pv2 = board.create('glider', [p02x, p02y, this.hl2], {fixed:true, visible:false, name:'pv2'});
+   let pv1x = () => this.pv1.X(), pv1y = () => this.pv1.Y(), pv2x = () => this.pv2.X(), pv2y = () => this.pv2.Y();
+   this.l2 = board.create('line', [this.pv1, this.pv2], {visible:false});
+   let dx = pv1x() - p1x(), dy = pv1y() - p1y();
+   let dist = Math.sqrt(dx*dx + dy*dy);
+   
+   // use circles to maintain constant offset
+   let circle1 = board.create('circle', [this.p1, dist], {visible:false});
+   this.int3 = board.create('intersection', [circle1, this.perpl1], {name:'int3', visible:false});
+   this.int4 = board.create('otherintersection', [circle1, this.perpl1, this.int3], {name:'int4', visible:false});
+   let circle2 = board.create('circle', [this.p2, dist], {visible:false});
+   this.int5 = board.create('intersection', [circle2, this.perpl2], {name:'int5', visible:false});
+   this.int6 = board.create('otherintersection', [circle2, this.perpl2, this.int5], {name:'int6', visible:false});
+   let circle3 =  board.create('circle', [this.p1, this.p3], {visible:false});
+   this.int7 = board.create('intersection', [circle3, this.perpl1], {name:'int7', visible:false});
+   this.int8 = board.create('otherintersection', [circle3, this.perpl1, this.int7], {name:'int8', visible:false});
+   let circle4 =  board.create('circle', [this.p2, this.p4], {visible:false});
+   this.int9 = board.create('intersection', [circle4, this.perpl2], {name:'int9', visible:false});
+   this.int10 = board.create('otherintersection', [circle4, this.perpl2, this.int9], {name:'int10', visible:false});
+   
+   if (d >= 0) {
+   this.hl3 = board.create('segment', [this.p1, this.int8], {name:'', ...thinStyle});
+   this.hl4 = board.create('segment', [this.p2, this.int10], {name:'', ...thinStyle});
+   // midpoint used in label positioning
+   this.mp0 = board.create('midpoint', [this.int4, this.int6], {name:'mp0', visible:false});
+   // baseline
+   this.bl = board.create('arrow', [this.int4, this.int6],{name:'', ...thinStyle, firstArrow:{type:1,size:6}, lastArrow:{type:1,size:6}});} 
+   else {
+   this.hl3 = board.create('segment', [this.p1, this.int7], {name:'', ...thinStyle});
+   this.hl4 = board.create('segment', [this.p2, this.int9], {name:'', ...thinStyle});
+   // midpoint used in label positioning
+   this.mp0 = board.create('midpoint', [this.int3, this.int5], {name:'mp0', visible:false});
+   // baseline
+   this.bl = board.create('arrow', [this.int3, this.int5],{name:'', ...thinStyle, firstArrow:{type:1,size:6}, lastArrow:{type:1,size:6}});
+   }
+   this.gp1 = board.create('group', [this.p1, this.p3]).setTranslationPoints(this.p1);
+   this.gp2 = board.create('group', [this.p2, this.p4]).setTranslationPoints(this.p2); 
    // label
-   this.p = board.create('point', plus( vc, mult( 8*pxunit, vn ) ),  
-     {name:toTEX(data[1]) , ...centeredLabelStyle});   
+   const vd2 = minus(XY(this.pv2), XY(this.pv1));
+   const [le2, a02] = polar(vd2);
+   const vn2 = rect( 1, a02+90*deg2rad );
+   const lmult = mult(8*pxunit, vn2);
+   let lcoords = plus(XY(this.mp0), lmult);
+   this.pl = board.create('point', lcoords, {name:'pl', visible:false});
+   this.perpl3 = board.create('perpendicular', [this.bl, this.mp0], {visible:false});
+   let circle5 =  board.create('circle', [this.mp0, this.pl], {visible:false});
+   this.int11 = board.create('intersection', [circle5, this.perpl3], {name:'int11', visible:false});
+   this.int12 = board.create('otherintersection', [circle5, this.perpl3, this.int11], {name:toTEX(data[1]), ...centeredLabelStyle});
+   const tp03 = board.create('point', [0,0], {size:0, visible:false});
+   const diffX1 = this.mp0.X() - tp03.X();
+   const diffY1 = this.mp0.Y() - tp03.Y();
+   let t1 = board.create('transform', [() => (this.mp0.X()-diffX1), () => (this.mp0.Y()-diffY1)], {type:'translate'});
+   t1.bindTo([tp03]);
+   let t = board.create('transform', [() => tp03.X(), () => tp03.Y()], {type:'translate'});
+   t.bindTo(this.pl);
  }
  data() { return this.d }
  name() { return '"'+this.d[1]+'"' }
-}
+} 
 
 // co-ordinate arrow with arrow with label 
 // ["dir", "name", [x1,y1], angle]
@@ -526,8 +596,8 @@ class disp {
 //  Loslager
 class fix1 {
   constructor(data) {
-		if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "SHOW"}
+    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
+    else {this.state = "SHOW"}
     this.d = data.slice(0);
     // base points
     const coords = [
@@ -540,57 +610,46 @@ class fix1 {
      [ + 0.8 * a, - 1*a],
      [ 0, - 1.9*a] //label
     ];
-    var p = [];
-    var pArr = [];
-    var c;
+    let p = [], pArr = [], c;
     for (c of coords) { p.push(board.create('point', c, {visible: false})); }
-    const t1 = board.create('transform', [data[3]*deg2rad], { type: 'rotate' });
-    const t2 = board.create('transform', data[2], { type: 'translate' });
+    const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
+    const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
     t1.applyOnce(pArr);
     t2.applyOnce(pArr);
     // dependent objects
     // pivot 
-    this.p1 = board.create('point', XY(p[0]), {name: '', ...nodeStyle});
-    this.p2 = board.create('point', XY(p[1]), {fixed:true, visible:false});
-    this.p3 = board.create('point', XY(p[2]), {fixed:true, visible:false});
-	  this.p4 = board.create('point', XY(p[3]), {fixed:true, visible:false});
-    this.p5 = board.create('point', XY(p[4]), {fixed:true, visible:false});
-    this.p6 = board.create('point', XY(p[5]), {fixed:true, visible:false});
-    this.p7 = board.create('point', XY(p[6]), {fixed:true, visible:false});
-    this.p8 = board.create('point', XY(p[7]), {fixed:true, visible:false});
+    const pointConfigs = {fixed: true, visible: false};
+    const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
+    {name: '', ...nodeStyle} : pointConfigs));
+    [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8] = points;
     pArr.push(this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.label);
     // label
-    this.label = board.create('point', XY(this.p8), {name:toTEX(data[1]),
-      ...centeredLabelStyle });
+    this.label = board.create('point', XY(this.p8), {name:toTEX(data[1]), ...centeredLabelStyle });
     // body
-    this.t = board.create('polygon', [this.p1, this.p2, this.p3], {
-      name: '',fillColor: "white", Opacity: true, layer: 7,
-      borders: {...normalStyle, layer:8}, vertices: { fixed: true, size: 0 } });
+    this.t = board.create('polygon', [this.p1, this.p2, this.p3], {name: '',fillColor: "white", Opacity: true, layer: 7,
+      borders: {...normalStyle, layer:8}, vertices: {fixed:true, size:0}});
     // baseline with hatch
-    this.bl = board.create('segment', [this.p6,this.p7], { name: '', ...normalStyle });
+    this.bl = board.create('segment', [this.p6,this.p7], {name: '', ...normalStyle});
     this.c = board.create("comb", [this.p7,this.p6], hatchStyle() );
     // Enable object animation	
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
-    const diffX = this.p1.X() - this.p0.X();
-		const diffY = this.p1.Y() - this.p0.Y();
-    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-		t3.bindTo(this.p0);
-		const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-		t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8, this.label, this.t, this.bl]); 
-    // The translation is bound to the points, but the points are not updated, yet
-		this.p1.moveTo([3,3], 2000);
-    
+    const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
+    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
+    t3.bindTo(this.p0);
+    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
+    t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8, this.label, this.t, this.bl]);
     // implement state switching
     this.obj = [ this.p1, this.t, this.bl, this.c, this.label, this.label.label ];
     this.obj = this.obj.concat(this.t.borders); 
     // state init
-		if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.c, this); makeSwitchable(this.t, this) } 
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) } 
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.c, this); makeSwitchable(this.t, this); break;
+    case 'hide': hide(this); makeSwitchable(this.c, this); makeSwitchable(this.t, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    }
     // proximity 
     this.loads = []
     }
@@ -615,58 +674,45 @@ class fix12 {
      [ + 0.8 * a, - a],
      [ 0, - 1.9*a] // label
     ];
-    var p = [];
-    var pArr = [];
-    var c;
-    for (c of coords) { p.push(board.create('point', c, {visible: false})); }
-    const t1 = board.create('transform', [data[3]*deg2rad], { type: 'rotate' });
-    const t2 = board.create('transform', data[2], { type: 'translate' });
+    let p = [], pArr = [], c;
+    for (c of coords) {p.push(board.create('point', c, {visible: false}));}
+    const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
+    const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
     t1.applyOnce(pArr);
     t2.applyOnce(pArr);
-    
-    this.p1 = board.create('point', XY(p[0]), {fixed:true, name: "", ...nodeStyle});
-    this.p2 = board.create('point', XY(p[1]), {fixed:true, visible:false});
-    this.p3 = board.create('point', XY(p[2]), {fixed:true, visible:false});
-	  this.p4 = board.create('point', XY(p[3]), {fixed:true, visible:false});
-    this.p5 = board.create('point', XY(p[4]), {fixed:true, visible:false});
-    this.p6 = board.create('point', XY(p[5]), {fixed:true, visible:false});
-    pArr.push(this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.label);
-
     // dependent objects
     // pivot 
-    this.label = board.create('point', XY(this.p6), {name:toTEX(data[1]),
-      ...centeredLabelStyle });
+    const pointConfigs = {fixed: true, visible: false};
+    const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
+    {name: '', ...nodeStyle} : pointConfigs));
+    [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6] = points;
+    pArr.push(this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.label);
+    this.label = board.create('point', XY(this.p6), {name:toTEX(data[1]), ...centeredLabelStyle});
     // body
-    this.t = board.create('polygon', [this.p1, this.p2, this.p3], {
-      name: '',fillColor: "white", Opacity: true, layer: 7, 
-      borders:{...normalStyle, layer:8}, vertices: { fixed: true, size: 0 } });
+    this.t = board.create('polygon', [this.p1, this.p2, this.p3], {name:'',fillColor:"white", Opacity:true, layer:7, 
+      borders:{...normalStyle, layer:8}, vertices: {fixed:true, size:0}});
     // baseline with hatch
     this.bl = board.create('segment', [this.p4, this.p5], {name: '',...normalStyle});
     this.c = board.create("comb", [this.p5, this.p4], hatchStyle() )
-   
     // Enable object animation	
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
-    const diffX = this.p1.X() - this.p0.X();
-		const diffY = this.p1.Y() - this.p0.Y();
-     
-    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-		t3.bindTo(this.p0);
-		const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-		t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.t, this.bl]); 
-    // The translation is bound to the points, but the points are not updated, yet
-		//this.p1.moveTo([3,3], 2000);
-       
+    const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
+    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
+    t3.bindTo(this.p0);
+    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
+    t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.t, this.bl]);      
     // implement state switching
-    this.obj = [ this.p1, this.t, this.bl, this.c, this.label, this.label.label ];
+    this.obj = [this.p1, this.t, this.bl, this.c, this.label, this.label.label];
     this.obj = this.obj.concat(this.t.borders); 
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.c, this); makeSwitchable(this.t, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) } 
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.c, this); makeSwitchable(this.t, this); break;
+    case 'hide': hide(this); makeSwitchable(this.c, this); makeSwitchable(this.t, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     // proximity 
     this.loads = []
   }
