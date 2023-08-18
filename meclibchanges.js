@@ -465,8 +465,8 @@ class dim {
    if (d<0) {di=d;da=-da}
    let negdivn = mult(-di,vn), posdavn = mult(da, vn);
 
-   this.p1 = board.create('point', [p01x + negdivn[0], p01y + negdivn[1]], {visible:false, name:'p1', fixed:true});
-   this.p2 = board.create('point', [p02x + negdivn[0], p02y + negdivn[1]], {visible:false, name:'p2', fixed:true});
+   this.p1 = board.create('point', [p01x + negdivn[0], p01y + negdivn[1]], {visible:true, name:'p1', fixed:false});
+   this.p2 = board.create('point', [p02x + negdivn[0], p02y + negdivn[1]], {visible:true, name:'p2', fixed:false});
    this.l = board.create('line', [this.p1, this.p2], {visible:false});
    let p1x = () => this.p1.X(), p1y = () => this.p1.Y(), p2x = () => this.p2.X(), p2y = () => this.p2.Y();
 
