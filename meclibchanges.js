@@ -163,8 +163,8 @@ class bar {
      else {this.state = "locked"}
    this.d = data.slice(0);
    // line
-   this.p1 = board.create('point',data[2],{withlabel:false, ...nodeStyle, fixed:false});
-   this.p2 = board.create('point',data[3],{withlabel:false, ...nodeStyle, fixed:false});
+   this.p1 = board.create('point',data[2],{withlabel:false, ...nodeStyle, fixed:true});
+   this.p2 = board.create('point',data[3],{withlabel:false, ...nodeStyle, fixed:true});
    this.l = board.create('line', [this.p1, this.p2], {visible:false});
    this.mp = board.create('midpoint', [this.p1, this.p2], {name:'mp', visible:false});
    this.line = board.create('segment', [this.p1, this.p2], {withlabel:false, ...barStyle});  
@@ -736,49 +736,42 @@ class fix123 {
      [0, +0.8*a], // p
      [-0.9*a,0]   // label
     ];
-    var p = [];
-    var pArr = [];
-    var c;
-    for (c of coords) { p.push(board.create('point', c, {visible: false})); }
-    const t1 = board.create('transform', [data[3]*deg2rad], { type: 'rotate' });
-    const t2 = board.create('transform', data[2], { type: 'translate' });
+    let p = [], pArr = [], c;
+    for (c of coords) { p.push(board.create('point', c, {visible:false}));}
+    const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
+    const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
     t1.applyOnce(pArr);
     t2.applyOnce(pArr);
     // dependent objects
     // base point
-    this.p1 = board.create('point', XY(p[0]), silentPStyle);	
-    this.p2 = board.create('point', XY(p[1]), {fixed:true, visible:false});
-    this.p3 = board.create('point', XY(p[2]), {fixed:true, visible:false});
-	  this.p4 = board.create('point', XY(p[3]), {fixed:true, visible:false});
+    const pointConfigs = {fixed:true, visible:false};
+    const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
+    {name: '', ...silentPStyle} : pointConfigs));
+    [this.p1, this.p2, this.p3, this.p4] = points;
     pArr.push(this.p1, this.p2, this.p3, this.p4, this.label);
     // label
-    this.label=board.create('point', XY(this.p4), {name:toTEX(data[1]), 
-      ...centeredLabelStyle });
+    this.label=board.create('point', XY(this.p4), {name:toTEX(data[1]), ...centeredLabelStyle});
     // baseline with hatch
     this.bl = board.create('segment', [this.p2,this.p3], {name: '',...normalStyle});
-    this.c = board.create("comb", [this.p3, this.p2], { ...hatchStyle(), angle:-45*deg2rad })
+    this.c = board.create("comb", [this.p3, this.p2], { ...hatchStyle(), angle:-45*deg2rad})
     // Enable object animation
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
-    const diffX = this.p1.X() - this.p0.X();
-		const diffY = this.p1.Y() - this.p0.Y();
-    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-		t3.bindTo(this.p0);
-		const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-		t4.bindTo([this.p2, this.p3, this.p4, this.label, this.bl]); 
-    // The translation is bound to the points, but the points are not updated, yet
-		//this.p1.moveTo([7,7], 2000);
-    this.p1.setAttribute({fixed:false});
-    
+    const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
+    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
+    t3.bindTo(this.p0);
+    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
+    t4.bindTo([this.p2, this.p3, this.p4, this.label, this.bl]); 
     // implement state switching
-    this.obj = [ this.p1, this.bl, this.c, this.label, this.label.label ];
+    this.obj = [ this.p1, this.bl, this.c, this.label, this.label.label];
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.c, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) } 
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.c, this); break;
+    case 'hide': hide(this); makeSwitchable(this.c, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     // proximity 
     this.loads = []
   }
@@ -804,53 +797,44 @@ class fix13 {
      [-0.2*a, +0.8*a], // p
      [-1.1*a,0]   // label
     ];
-    var p = [];
-    var pArr = [];
-    var c;
-    for (c of coords) { p.push(board.create('point', c, {visible: false})); }
-    const t1 = board.create('transform', [data[3]*deg2rad], { type: 'rotate' });
-    const t2 = board.create('transform', data[2], { type: 'translate' });
+    let p = [], pArr = [], c;
+    for (c of coords) { p.push(board.create('point', c, {visible:false}));}
+    const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
+    const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
     t1.applyOnce(pArr);
     t2.applyOnce(pArr);
     // dependent objects
     // base point
-    this.p1 = board.create('point', XY(p[0]), silentPStyle);
-    this.p2 = board.create('point', XY(p[1]), {fixed:true, visible:false});
-    this.p3 = board.create('point', XY(p[2]), {fixed:true, visible:false});
-	  this.p4 = board.create('point', XY(p[3]), {fixed:true, visible:false});
-    this.p5 = board.create('point', XY(p[4]), {fixed:true, visible:false});
-    this.p6 = board.create('point', XY(p[5]), {fixed:true, visible:false});
+    const pointConfigs = {fixed: true, visible: false};
+    const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
+    {name: '', ...silentPStyle} : pointConfigs));
+    [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6] = points;
     pArr.push(this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.label);
     // label
-    this.label=board.create('point', XY(this.p6), {name:toTEX(data[1]),
-      ...centeredLabelStyle });
+    this.label=board.create('point', XY(this.p6), {name:toTEX(data[1]), ...centeredLabelStyle});
     this.l = board.create('segment', [this.p2,this.p3], {name: '', ...normalStyle});
     this.bl = board.create('segment', [this.p4,this.p5], {name: '', ...normalStyle});
-    this.c = board.create("comb", [this.p5,this.p4], {...hatchStyle(), angle:-45*deg2rad } );
+    this.c = board.create("comb", [this.p5,this.p4], {...hatchStyle(), angle:-45*deg2rad});
     // Enable object animation	
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
-    const diffX = this.p1.X() - this.p0.X();
-		const diffY = this.p1.Y() - this.p0.Y();
-    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-		t3.bindTo(this.p0);
-		const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-		t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.bl]); 
-    // The translation is bound to the points, but the points are not updated, yet
-		this.p1.moveTo([7,7], 2000);
-    //this.p1.setAttribute({fixed:false});
+    const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
+    const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
+    t3.bindTo(this.p0);
+    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
+    t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.bl]); 
     // switchable objects
-    this.obj = [ this.p1, this.l, this.bl, this.c, this.label, this.label.label ];
+    this.obj = [ this.p1, this.l, this.bl, this.c, this.label, this.label.label];
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.c, this) } 
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.c, this); makeSwitchable(this.l, this); break;
+    case 'hide': hide(this); makeSwitchable(this.c, this); makeSwitchable(this.l, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    }
     // proximity 
     this.loads = []
-    
   }
   data(){ var a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
@@ -897,7 +881,7 @@ class force {
     var d = 0; if (this.state == "dotted") d=2
     // arrow version with fixed:false doesn't snap to grid
     //this.vec = board.create('arrow', [this.p1, this.p2], {
-    //  touchLastPoint: true, fixed:false, snapToGrid:true, lastArrow:{size:5, type:2}, highligh    
+    // touchLastPoint: true, fixed:false, snapToGrid:true, lastArrow:{size:5, type:2}, highligh    
     this.vec = board.create('arrow', [this.p1, this.p2], {
       touchLastPoint: true, lastArrow:{size:5, type:2}, highlight:hl,
       highlightStrokeColor:highlightColor, strokeColor:loadColor, dash:d});
@@ -933,8 +917,7 @@ class force {
     // points for position check
     this.proximityPoints = [this.p1, this.p2];
   }
-  data() { return [this.d[0], this.fname, 
-    XY(this.p1), XY(this.p2), this.off, this.state ] }
+  data() { return [this.d[0], this.fname, XY(this.p1), XY(this.p2), this.off, this.state ] }
   name() { return toSTACK(this.fname) }
 }
 
@@ -1254,123 +1237,84 @@ class point {
 // Version with hole adapted from https://github.com/Niclas17/meclib 
 // gray filled polygon with black border
 class polygon{
-  constructor(data) {
-    let pstyle = {
-      opacity: true,
-      fillcolor: 'lightgray',
-      vertices: {
-        size: 0,
-        fixed: true
-      },
-      borders: normalStyle,
-      hasInnerPoints: true
-    }
-    // if last argument is a string, use it as state flag and remove from list
-    if (typeof(data[data.length - 1]) == 'string') {this.state = data.pop()} else {this.state = "SHOW"}
-    
-    // data for name()
-    this.loads = [];
-    this.d = data.slice(0);
-    // geometric data
-    this.v = data.slice(2);
-    console.log('this.v is here: ' + this.v);
-    //this.vflat = this.v.flat();
-     this.pArr = [];
-  let hasHole = false;
-
-// Check if the polygon has holes
-  if (this.v[0].length > 2) {
-    hasHole = true;
-  }
-  let sumX = 0;
-  let sumY = 0;
-  // Iterate over the coordinates to create points
-  for (const coord of this.v) {
-    const x = coord[0];
-    const y = coord[1];
-    this.pAll = board.create('point', [x, y], {size:1, visible: false});
-    this.pArr.push(this.pAll);
-    // Update the sum of x-coordinates and y-coordinates
-     sumX += x;
-    sumY += y;
-  }
-  // Calculate the average of x-coordinates and y-coordinates
-  const avgX = sumX / this.v.length;
-  const avgY = sumY / this.v.length;
-  // Create the polygon based on whether it has holes or not
- if (hasHole) {
-    this.clines = [];
-  this.path = this.v.shift();
-  this.path.push(this.path[0]);
-  for (const border of this.v) {
-    this.clines.push(this.path.length - 1);
-    this.path = this.path.concat(border);
-    this.path.push(border[0]);
-    this.clines.push(this.path.length - 1);
-  }
-// suppress the connector lines
+    constructor(data) {
+      let pstyle = {opacity:true, fillcolor:'lightgray', vertices:{size:0, fixed:true}, borders:normalStyle, hasInnerPoints:true}
+      // if last argument is a string, use it as state flag and remove from list
+      if (typeof(data[data.length - 1]) == 'string') {this.state = data.pop()} else {this.state = "SHOW"}
+      
+      // data for name()
+      this.loads = [];
+      this.d = data.slice(0);
+      // geometric data
+      this.v = data.slice(2);
+      console.log('this.v is here: ' + this.v);
+      //this.vflat = this.v.flat();
+      this.pArr = [];
+      let hasHole = false;
+      // Check if the polygon has holes
+      if (this.v[0].length > 2) {hasHole = true;}
+      let sumX = 0, sumY = 0;
+      // Create dynamic points based on the number of vertices
+      for (let i = 0; i < this.v.length; i++) {
+      const x = this.v[i][0], y = this.v[i][1];
+      this.pArr.push(board.create('point', [x,y], {size:0, visible:true, fixed:false}));
+      this[`p${i + 1}`] = this.pArr[i]; // Create dynamic point properties
+      // Update the sum of x-coordinates and y-coordinates
+      sumX += x;
+      sumY += y;
+      } 
+      // Calculate the average of x-coordinates and y-coordinates
+      const avgX = sumX/this.v.length, avgY = sumY/this.v.length; 
+      // Create polygon
+      if (hasHole) {
+      this.clines = [];
+      this.path = this.v.shift();
+      this.path.push(this.path[0]);
+      for (const border of this.v) {
+      this.clines.push(this.path.length - 1);
+      this.path = this.path.concat(border);
+      this.path.push(border[0]);
+      this.clines.push(this.path.length - 1);
+      }
+      // suppress the connector lines
       for (const i of this.clines)
-        this.p.borders[i].setAttribute({visible:false});
-    const outerContour = this.pArr.slice(0, 2); // this.v[0].length === 2
-    const innerContours = [];
-    let startIndex = 2;
-    while (startIndex < this.pArr.length) {
-      const innerContour = this.pArr.slice(startIndex, startIndex + 2);
-      innerContours.push(innerContour);
-      startIndex += 2;
-    }
-    this.p = board.create('polygon', [outerContour, innerContours], pstyle);
-    // Adjust the visibility of inner borders inside overlapping polygons
-    for (const i of this.clines) {
-      if (this.p.borders[i] && this.p.borders[i].getAttribute('withLabel') === 'false') {
-        this.p.borders[i].setAttribute(invisibleBorderStyle);
+      this.p.borders[i].setAttribute({visible:false});
+      const outerContour = pArr.slice(0, 2); 
+      const innerContours = [];
+      let startIndex = 2;
+      while (startIndex < pArr.length) {
+        const innerContour = pArr.slice(startIndex, startIndex + 2);
+        innerContours.push(innerContour);
+        startIndex += 2;
+      }
+      this.p = board.create('polygon', [outerContour, innerContours], pstyle);
+      // Adjust the visibility of inner borders inside overlapping polygons
+      for (const i of this.clines) {
+      if (this.p.borders[i] && this.p.borders[i].getAttribute('withLabel') === 'false') {this.p.borders[i].setAttribute(invisibleBorderStyle);}}} 
+      else {this.p = board.create('polygon', this.pArr, pstyle);
+      // Adjust the visibility of inner borders inside overlapping polygons
+      for (const border of this.p.borders) {
+      if (border.getAttribute('withLabel') === 'false') {border.setAttribute(invisibleBorderStyle);}}}
+      this.p.setAttribute({fixed:true});
+      this.p.obj = [this.p, this.pArr];
+      this.p.parent = this;
+      const pointgroup = board.create('group', this.pArr);
+      //.setRotationCenter('centroid').setRotationPoints(this.pArr);
+      //this.pArr[3].moveTo([10,4], 2000);		// test random point movement
+      // switching objects
+      this.obj = [this.p].concat(this.p.borders);
+      // state init
+      switch (this.state) {
+      case 'show': show(this); makeSwitchable(this.p, this); break;
+      case 'hide': hide(this); makeSwitchable(this.p, this); break;
+      case 'SHOW': SHOW(this); break;
+      case 'HIDE': HIDE(this); break;
       }
     }
-  } 
-  else {
-    this.p = board.create('polygon', this.pArr, pstyle);
-    console.log('test pArr : ' + this.pArr[2].Y());
-    
-    // Adjust the visibility of inner borders inside overlapping polygons
-    for (const border of this.p.borders) {
-      if (border.getAttribute('withLabel') === 'false') {
-        border.setAttribute(invisibleBorderStyle);
-      }
-    }
+    hasPoint(pt) { return isOn(pt, this.p) }
+    data() { var a = this.d.slice(0); a.push(this.state); return a }
+    name() { return targetName(this) }
   }
-  // Enable object animation
-  this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
-  this.p1 = board.create('point', [avgX,avgY], {fixed:true, visible:true, name:'p1'});
-  const diffX1 = this.p1.X() - this.p0.X();
-  const diffY1 = this.p1.Y() - this.p0.Y();
-  
-  const t1 = board.create('transform', [() => this.p1.X() - diffX1, () => this.p1.Y() - diffY1], {type: 'translate'});
-  t1.bindTo(this.p0);
-  const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-  t2.bindTo(this.pArr); 
-  //this.p1.moveTo([6,6], 2000);
-
-    // switching objects
-    this.obj = [this.p].concat(this.p.borders);
-    // state init
-    if (this.state == "show") show(this)
-    if (this.state == "hide") hide(this)
-    if (this.state != "SHOW" && this.state != "HIDE") makeSwitchable(this.p, this)
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
-  }
-  hasPoint(pt) {
-    return isOn(pt, this.p)
-  }
-  data() {
-    var a = this.d.slice(0);
-    a.push(this.state);
-    return a
-  }
-  name() {
-    return targetName(this)
-  }
-}
 
 // line load 
 // line load perpendicular to the line
@@ -1469,24 +1413,23 @@ class rope {
 class rot {
   constructor(data) {
   this.d = data;		
-    this.p1 = board.create('point', data[2], {visible:true, fixed:true, size:1, showInfobox:false, name: '' });
-    this.p2 = board.create('point', data[3], {visible:false, fixed:true, size:1, showInfobox:false, name: '' }); 
+    this.p1 = board.create('point', data[2], {visible:false, fixed:true, showInfobox:false, name:'p1'});
+    this.p2 = board.create('point', data[3], {visible:false, fixed:true, showInfobox:false, name:'p2'}); 
     // label
-    this.p3 = board.create('point', data[4], {    
-      name:toTEX(data[1]) ,size:0, label:{offset:[0,0],color:'red'}, showInfobox:false});
-    this.arc = board.create('minorArc', [this.p1, this.p2, this.p3], {
-      fixed:true, ...thinStyle,  lastArrow: { type: 1, size: 6 }, strokeColor:"red"});
+    this.p3 = board.create('point', data[4], 
+    {name:toTEX(data[1]) , fixed:true, size:0, label:{offset:[0,0],color:'red'}, showInfobox:false});
+    this.arc = board.create('minorArc', [this.p1, this.p2, this.p3], 
+    {fixed:true, ...thinStyle,  lastArrow: { type: 1, size: 6 }, strokeColor:"red"});
     // Enable object animation
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
     const diffX = this.p1.X() - this.p0.X();
-		const diffY = this.p1.Y() - this.p0.Y();
-    const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-		t1.bindTo(this.p0);
-		const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-		t2.bindTo([this.p2, this.p3]); 
+    const diffY = this.p1.Y() - this.p0.Y();
+    const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
+    t1.bindTo(this.p0);
+    const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
+    t2.bindTo([this.p2, this.p3]); 
     // The translation is bound to the points, but the points are not updated, yet
-		//this.p1.moveTo([5,7], 2000);
-		this.p1.setAttribute({fixed:false});		// to enable dragging, p1 must have visible size
+    //this.p1.moveTo([5,7], 2000);    
   }
   data() { return this.d }
   name() { return '"'+this.d[1]+'"' }
@@ -1599,171 +1542,65 @@ class springc {
     if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
       else {this.state = "SHOW"}
     this.d = data.slice(0); //make a copy
-    var r;
-    var x = this.d[2][0];
-    var y =  this.d[2][1];
-    var dx = (this.d[3][0]-x);
-    var dy = (this.d[3][1]-y);
-    var l = Math.sqrt(dx**2+dy**2);
-    if (data.length >4 ) {r = data[4]} else {r = 6*pxunit}
-    if (data.length >5 ) {this.n = data[5]*2+1} else {this.n = Math.ceil(l/(5*pxunit))}
-    if (data.length >6 ) {this.off = data[6]} else {this.off = 14*pxunit}
-    var c = r/l;
-    var numberOfSpringRings = this.n;
-    // Ensure numberOfSpringRings is even, if not, make it even
-if (numberOfSpringRings % 2 !== 0) {
-  numberOfSpringRings--; // Increment by 1 to make it even
-}
+    this.p1 = board.create('point', data[2], {fixed:true, name:'p1', visible:false});
+    this.p2 = board.create('point', data[3], {fixed:true, name:'p2', visible:false});
+    let x1 = () => this.p1.X(), y1 = () => this.p1.Y();
+    let x2 = () => this.p2.X(), y2 = () => this.p2.Y();
+    let dx = () => (x2() - x1());
+    let dy = () => (y2() - y1());
+    let l = () => Math.sqrt(dx()**2+dy()**2);
+    if (data.length > 4) {this.r = data[4]} else {this.r = 6*pxunit}
+    if (data.length > 5) {this.n = data[5]*2+1} else {this.n = Math.ceil(l()/(5*pxunit))}
+    if (data.length > 6) {this.off = data[6]} else {this.off = 14*pxunit}
+    this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve
+    
+    // Enable springc animation
+    this.line.updateDataArray = function() {
+    let xcoords = [], ycoords = [];
+    // since this.r and this.n is used in this function scope, they have to be defined in here too
+    if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
+    if (data.length >5 ) {this.n = data[5]*2+1} else {this.n = Math.ceil(l()/(5*pxunit))}
+    let c = () => this.r/l();
+    // ensure this.n (or any other data) is in the correct variable scope
+    //console.log('this.n is here: ' + this.n);   // check if number of turns changes during animation
     // start point
-    var px = [x-dy*c];
-    var py = [y+dx*c];
+    xcoords.push(x1()-dy()*c());
+    ycoords.push(y1()+dx()*c()); 
     // intermediate points
-    var j;
-    for (j = 0; j < this.n+1; j++) {
-      px.push(x+dx*j/this.n+dy*c*(-1)**j);
-      py.push(y+dy*j/this.n-dx*c*(-1)**j);
-      //board.create('point', [px,py], {visible:true});
+    for (let j = 0; j < this.n+1; j++) {
+      xcoords.push(x1()+dx()*j/this.n+dy()*c()*(-1)**j);
+      ycoords.push(y1()+dy()*j/this.n-dx()*c()*(-1)**j);
     }
-    // last point
-    px.push(x+dx+dy*c,x+dx-dy*c);
-    py.push(y+dy-dx*c,y+dy+dx*c);
-    this.p1 = board.create('point', data[2], {name: 'p1', visible:false });	//...silentPStyle
-    this.p5 = board.create('point', data[3], {name: 'p5', visible:false });
-    //this.p4 = board.create('point', [xf, yf], {name: 'p4', visible:false});
-    this.springCoils = [];
-
-	// Normalize the direction vector
-	       dx /= l;
-	       dy /= l;
-    // Calculate the coordinates of points above and below the segment
-		var aboveX1 = this.p1.X() + r * dy;
-		var aboveY1 = this.p1.Y() - r * dx;
-		var belowX1 = this.p1.X() - r * dy;
-		var belowY1 = this.p1.Y() + r * dx;
-		var aboveX2 = this.p5.X() + r * dy;
-		var aboveY2 = this.p5.Y() - r * dx;
-		var belowX2 = this.p5.X() - r * dy;
-		var belowY2 = this.p5.Y() + r * dx;
-		
-    // Create JSXGraph points above and below the segment
-    var pointAbove1 = board.create('point', [aboveX1, aboveY1], { visible: false, name: 'A1' });
-    var pointBelow1 = board.create('point', [belowX1, belowY1], { visible: false, name: 'B1' });
-    var pointAbove2 = board.create('point', [aboveX2, aboveY2], { visible: false, name: 'A2' });
-    var pointBelow2 = board.create('point', [belowX2, belowY2], { visible: false, name: 'B2' });
-    var segment1 = board.create('segment', [this.p1, this.p5], {visible:false});
-    var segment2 = board.create('segment', [pointAbove1, pointAbove2], {visible:false});
-    var segment3 = board.create('segment', [pointBelow1, pointBelow2], {visible:false});
-    
-     // create the mass at the moving end of the spring (named as p2 for user ease)
-    this.p2 = board.create('glider', [this.p5.X(), this.p5.Y(), segment1], {fixed:false, visible:true, name:'p2', size:1});
-    
-    var endp = board.create('glider', [function() {return (this.p2.X());}.bind(this), 
-    function() {return (this.p2.Y());}.bind(this), segment3], 
-    {fixed:true, visible:false, name:'e'});
-    
-      // final glider at pointAbove2
-  var finalglider = board.create('glider', [function() {return (this.p2.X());}.bind(this), 
-    function() {return (this.p2.Y());}.bind(this), segment2], 
-    {fixed:true, visible:false, name:'fg'});
-    
-    // The point at the fixed start of the spring
-  	var startp = board.create('point', XY(pointAbove1), {fixed: true, visible:false, name:'startp'});
-
-  	var gliderRingsEven = [];
-  	var gliderRingsOdd = [];
-
-    for (let i = 0; i < numberOfSpringRings; i++) {
-    // startp.X() - (i+1) if x of p1 is bigger than 
-		let srx, sry;
-    if(this.p1.X() > this.p5.X()) {
-		srx = function(i) {
-		          return function() {
-		            return startp.X() - (i+1) * Math.abs((startp.X() - endp.X()) / 
-                (numberOfSpringRings + 1))	 };}(i);
-                
-     } else {
-     srx = function(i) {
-		          return function() {
-		            return startp.X() + (i+1) * Math.abs((startp.X() - endp.X()) / 
-                (numberOfSpringRings + 1))	 };}(i);
-     
-     }
-		 if(this.p1.Y() > this.p5.Y()) {         
-		sry = function(i) {
-		       return function() {
-		         return startp.Y() - (i+1) * Math.abs((endp.Y() - startp.Y()) / 
-             (numberOfSpringRings+1)) 	};}(i);
-     } else {
-     sry = function(i) {
-		       return function() {
-		         return startp.Y() + (i+1) * Math.abs((endp.Y() - startp.Y()) / 
-             (numberOfSpringRings+1)) 	};}(i);
-     
-     }
-       if (i % 2 === 0) {
-       // Even point, move 1 radius higher
-        //console.log('springRings i X :' + springRings[i].X());	// returns 2, Y returns 8.5
-      gliderRingsEven.push(board.create('glider', [srx, sry, segment3], 
-             {fixed: false, visible:false, name:'even'}))      
-       } else {
-        // Odd point, move 1 radius lower
-       gliderRingsOdd.push(board.create('glider', [srx, sry, segment2], 
-              {fixed:false, visible:false, name:'odd'}))
-       }
-      }
-    
-    // Section to determine how endp connects to final even or odd segments
-   // for even number of spring rings, meaning no. of even gliders = no. of odd gliders
-	for (let i = 0; i < gliderRingsEven.length; i++) {
-  const evenRing = gliderRingsEven[i];
-  const oddRing = gliderRingsOdd[i];
-	
-  this.springCoils.push(board.create('segment', [evenRing, oddRing], normalStyle));
-}  
- // Odd point, move 1 y-coordinate lower
- // segments between odd to even gliders
-	for (let i = 0; i < gliderRingsOdd.length-1; i++) {
-      const evenRing = gliderRingsEven[i+1];
-      const oddRing = gliderRingsOdd[i];
-    
-      this.springCoils.push(board.create('segment', [oddRing, evenRing], normalStyle));
-    }                 
-                 
-	// End segment
-	this.springCoils.push(board.create('segment', [gliderRingsOdd[gliderRingsOdd.length-1], endp], normalStyle));
-  // draw initial base line segments from the start of the spring
-  this.springCoils.push(board.create('segment', [pointBelow1, pointAbove1], normalStyle));
-  // draw end base line segments from the ends of the spring to the wall and mass
-  this.springCoils.push(board.create('segment', [endp, finalglider], normalStyle));
-  // draw line segments from the ends of the spring to the wall and mass
-  this.springCoils.push(board.create('segment', [pointAbove1, gliderRingsEven[0]], normalStyle));
-
-    // Calculate the dynamic midpoint of the segment for label coordinates
-  	var labelX = function() {return ((this.p1.X() + this.p2.X()) / 2)+this.off}.bind(this);
-  	var labelY = function() {return ((this.p1.Y() + this.p2.Y()) / 2)+this.off}.bind(this);
+		// last point
+    xcoords.push(x1()+dx()+dy()*c(),x1()+dx()-dy()*c());
+    ycoords.push(y1()+dy()-dx()*c(),y1()+dy()+dx()*c());   
+    this.dataX = xcoords;
+    this.dataY = ycoords;
+    }
     // label
-    this.lbl = board.create('point',[labelX, labelY], {    
-      name: toTEX(data[1]),  ...centeredLabelStyle });
-
+    let labelX = () => x1()+dx()/2-dy()/l()*(this.off+this.r);
+    let labelY = () => y1()+dy()/2+dx()/l()*(this.off+this.r);
+    this.lbl = board.create('point', [labelX,labelY], {name:toTEX(data[1]), ...centeredLabelStyle});
     // logging
-    console.log("springc", data[1], data[2], data[3], r,  Math.floor(this.n/2), this.off);
+    console.log("springc", data[1], data[2], data[3], this.r, Math.floor(this.n/2), this.off);
     // implement state switching
-    this.obj = [...this.springCoils, this.lbl.label]; //this.line,
+    this.obj = [this.line, this.lbl.label]; 
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.springCoils, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.line, this); break;
+    case 'hide': hide(this); makeSwitchable(this.line, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    }
+    this.line.setAttribute({highlightFillOpacity:0});
     this.s = board.create('segment', [this.p1,this.p2],{strokeWidth:0});
     targets.push(this.s);
     this.loads = []
   }
   data(){ var a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
-  hasPoint(pt) {return (isOn(pt,this.s) || isOn(pt,this.p1)) && 
-    JXG.Math.Geometry.distPointLine(
-      [1,pt.X(),pt.Y()], this.s.stdform) < tolPointLine} 
+  hasPoint(pt) {return (isOn(pt,this.s) || isOn(pt,this.p1)) && JXG.Math.Geometry.distPointLine(
+  [1,pt.X(),pt.Y()], this.s.stdform) < tolPointLine} 
 }
 
 //tensile spring
