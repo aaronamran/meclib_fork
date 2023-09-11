@@ -139,11 +139,9 @@ class angle {
     // Enable object animation
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
     const diffX = this.p1.X() - this.p0.X();
-		const diffY = this.p1.Y() - this.p0.Y();
+    const diffY = this.p1.Y() - this.p0.Y();
     const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-		t1.bindTo(this.p0);
-		const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-		t2.bindTo([this.p2, this.p3, this.p4, this.p5]); 
+    t1.bindTo([this.p2, this.p3, this.p4, this.p5]);
  }
  data() {return this.d}
  name() {return '"'+this.d[1]+'"'}
@@ -284,9 +282,7 @@ class circle {
     const diffX = this.p1.X() - this.p0.X();
     const diffY = this.p1.Y() - this.p0.Y();
     const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-    t1.bindTo(this.p0);
-    const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-    t2.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p]); 
+    t1.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p]);
     // state init
     switch (this.state) {
     case 'show': show(this); makeSwitchable(this.c, this); break;
@@ -526,9 +522,7 @@ class dim {
    const diffX1 = this.mp0.X() - tp03.X();
    const diffY1 = this.mp0.Y() - tp03.Y();
    let t1 = board.create('transform', [() => (this.mp0.X()-diffX1), () => (this.mp0.Y()-diffY1)], {type:'translate'});
-   t1.bindTo([tp03]);
-   let t = board.create('transform', [() => tp03.X(), () => tp03.Y()], {type:'translate'});
-   t.bindTo(this.pl);
+   t1.bindTo(this.pl);
  }
  data() { return this.d }
  name() { return '"'+this.d[1]+'"' }
@@ -629,9 +623,7 @@ class fix1 {
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
     const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
     const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
-    t3.bindTo(this.p0);
-    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
-    t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8, this.label, this.t, this.bl]);
+    t3.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8, this.label, this.t, this.bl]);
     // implement state switching
     this.obj = [ this.p1, this.t, this.bl, this.c, this.label, this.label.label ];
     this.obj = this.obj.concat(this.t.borders); 
@@ -692,9 +684,7 @@ class fix12 {
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
     const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
     const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
-    t3.bindTo(this.p0);
-    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
-    t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.t, this.bl]);      
+    t3.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.t, this.bl]);     
     // implement state switching
     this.obj = [this.p1, this.t, this.bl, this.c, this.label, this.label.label];
     this.obj = this.obj.concat(this.t.borders); 
@@ -752,9 +742,7 @@ class fix123 {
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
     const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
     const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
-    t3.bindTo(this.p0);
-    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
-    t4.bindTo([this.p2, this.p3, this.p4, this.label, this.bl]); 
+    t3.bindTo([this.p2, this.p3, this.p4, this.label, this.bl]);
     // implement state switching
     this.obj = [ this.p1, this.bl, this.c, this.label, this.label.label];
     // state init
@@ -813,9 +801,7 @@ class fix13 {
     this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
     const diffX = this.p1.X() - this.p0.X(), diffY = this.p1.Y() - this.p0.Y();
     const t3 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
-    t3.bindTo(this.p0);
-    const t4 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
-    t4.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.bl]); 
+    t3.bindTo([this.p2, this.p3, this.p4, this.p5, this.p6, this.label, this.bl]);
     // switchable objects
     this.obj = [ this.p1, this.l, this.bl, this.c, this.label, this.label.label];
     // state init
@@ -1467,9 +1453,7 @@ class rot {
     const diffX = this.p1.X() - this.p0.X();
     const diffY = this.p1.Y() - this.p0.Y();
     const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type:'translate'});
-    t1.bindTo(this.p0);
-    const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type:'translate'});
-    t2.bindTo([this.p2, this.p3]); 
+    t1.bindTo([this.p2, this.p3]);
     // The translation is bound to the points, but the points are not updated, yet
     //this.p1.moveTo([5,7], 2000);    
   }
@@ -1652,195 +1636,84 @@ class springt {
     // Parameter handling
     if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
       else {this.state = "SHOW"}
+   
     this.d = data.slice(0); //make a copy
-    var x = this.d[2][0];
-    var y =  this.d[2][1];
-    var dx = (this.d[3][0]-x);
-    var dy = (this.d[3][1]-y);
-    var l = Math.sqrt(dx**2+dy**2);
-    var r,pr;
-    if (data.length >4 ) {r = data[4] } else {r = 6*pxunit}
-    if (data.length >5 ) {pr = data[5] } else {pr = 20}
-    if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l*(1-pr/50)/(5*pxunit))}
+    this.p1 = board.create('point', data[2], {fixed:false, name:'p1'});
+    this.p2 = board.create('point', data[3], {fixed:false, name:'p2'});
+    
+    let x1 = () => this.p1.X(), y1 = () => this.p1.Y();
+    let x2 = () => this.p2.X(), y2 = () => this.p2.Y(); 
+    let dx = () => (x2() - x1());
+    let dy = () => (y2() - y1()); 
+    const dx1 = (this.p2.X() - this.p1.X());
+    const dy1 = (this.p2.Y() - this.p1.Y());
+    const dxx = () => (this.p2.X() - this.p1.X());
+    const dyy = () => (this.p2.Y() - this.p1.Y());
+    // need two types to solve issue of changing number of turns during animation
+    let l1 = Math.sqrt(dx1**2+dy1**2);  
+    let l2 = () => Math.sqrt(dx()**2+dy()**2);
+    if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
+    if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
+    if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}
     if (data.length >7 ) {this.off = data[7]} else {this.off = 14*pxunit}
-    var c = r/l;
-    var numberOfSpringRings = this.n;
+    this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve
+    
+    const d0 = Math.sqrt((data[3][0]-data[2][0])**2 + (data[3][1]-data[2][1])**2);
+    const d1 = () => Math.sqrt((this.p2.X()-this.p1.X())**2 + (this.p2.Y()-this.p1.Y())**2);
+    
+    //let c = this.r/l2();
+    let xf = () => x1()+this.pr/(100)*dx();		
+    let yf = () => y1()+this.pr/(100)*dy();
+    let dxf = () => dx() - 2*this.pr/100*dx();
+    let dyf = () => dy() - 2*this.pr/100*dy();
+    
+    // Enable springt animation
+    this.line.updateDataArray = function() {
+    let xcoords = [], ycoords = [];
+    // since this.r, this.pr and this.n is used in this function scope, they have to be defined in here too
+    if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
+    if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
+    if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}
+    //console.log('d1 is here: ' + d1());
+    let lf = () => d1()/d0;
+    //console.log('lf is here: ' + lf());
+    let xf1 = () => x1()+this.pr/(lf()*100)*dx();		
+    let yf1 = () => y1()+this.pr/(lf()*100)*dy();
+    let dxf1 = () => dx() - 2*this.pr/(lf()*100)*dx();
+    let dyf1 = () => dy() - 2*this.pr/(lf()*100)*dy();
+    const cf = () => this.r/(l2()*(1-this.pr/(lf()*50)));
     // start point
-    var xf=(x+pr/100*dx);
-    var yf=(y+pr/100*dy);
-    var dxf= (dx - 2*pr/100*dx);
-    var dyf= (dy - 2*pr/100*dy);
-    var cf=r/(l*(1-pr/50));
-    // spring structure from left to right: p1, p4, p3, p5, mass as p2 for easy use 
-    // snap targets
-    this.p1 = board.create('point', data[2], {name: 'p1', visible:false });	//...silentPStyle
-    this.p5 = board.create('point', data[3], {name: 'p5', visible:false });
-    this.p4 = board.create('point', [xf, yf], {name: 'p4', visible:false});
-    this.springCoils = [];
+    xcoords.push(x1(), xf1()); 
+    ycoords.push(y1(), yf1());  
+    // intermediate points
+    for (let j = 1; j < (this.n+1); j++) {
+      xcoords.push(xf1()+dxf1()*(j-0.5)/this.n+dyf1()*cf()*(-1)**j);
+      ycoords.push(yf1()+dyf1()*(j-0.5)/this.n-dxf1()*cf()*(-1)**j);
+    }
+    // end point
+    xcoords.push(xf1()+dxf1(), x2());	
+    ycoords.push(yf1()+dyf1(), y2());	
     
-    // Calculate the direction vector of the segment
-    var dx = (this.p5.X() - this.p4.X());
-    var dy = (this.p5.Y() - this.p4.Y());
-    var length = Math.sqrt(dx * dx + dy * dy);
-
-		// Normalize the direction vector
-     dx /= length;
-     dy /= length;
-     
-    // Calculate the distance between mass and endp (should be the same as between p1 and p2)
-    // for reasons unknown, default distance between endp and mass is not the same as that of p1 and p2
-		var distanceP1P2 = Math.sqrt((this.p4.X() - this.p1.X()) ** 2 + (this.p4.Y() - this.p1.Y()) ** 2);
-		var distanceMassEndp = distanceP1P2; // To maintain the same distance
-    this.p3 = board.create('point', [xf+dxf, yf+dyf], {name: 'p3', visible:false});
-    // Calculate the coordinates of points above and below the segment
-		var aboveX1 = this.p4.X() + r * dy;
-		var aboveY1 = this.p4.Y() - r * dx;
-		
-		var belowX1 = this.p4.X() - r * dy;
-		var belowY1 = this.p4.Y() + r * dx;
-		
-		var aboveX2 = this.p5.X() + r * dy;
-		var aboveY2 = this.p5.Y() - r * dx;
-		
-		var belowX2 = this.p5.X() - r * dy;
-		var belowY2 = this.p5.Y() + r * dx;
-		
-    // Create JSXGraph points above and below the segment
-    var pointAbove1 = board.create('point', [aboveX1, aboveY1], { visible: false, name: 'A1' });
-    var pointBelow1 = board.create('point', [belowX1, belowY1], { visible: false, name: 'B1' });
-    var pointAbove2 = board.create('point', [aboveX2, aboveY2], { visible: false, name: 'A2' });
-    var pointBelow2 = board.create('point', [belowX2, belowY2], { visible: false, name: 'B2' });
-
-  	var line1 = board.create('line', [this.p3, this.p5], {straightFirst:false, visible:false});
-    var line2 = board.create('line', [pointAbove1, pointAbove2], {visible:false});
-    var line3 = board.create('line', [pointBelow1, pointBelow2], {visible:false});
-    var segment4 = board.create('segment', [this.p1, this.p4], normalStyle);
-    this.springCoils.push(segment4);
-    // create the mass at the moving end of the spring (named as p2 for user ease)
-    this.p2 = board.create('glider', [this.p5.X(), this.p5.Y(), line1], {fixed:false, visible:true, name:'p2', size:1});
-    // Calculate the position of endp relative to mass
-    var endp = board.create('glider', [function() {return (this.p2.X() - distanceMassEndp * dx);}.bind(this), 
-    function() {return (this.p2.Y() - distanceMassEndp * dy);}.bind(this), line1], 
-    {fixed:true, visible:false, name:'e'});
-    var segment5 = board.create('segment', [this.p2, endp], normalStyle);
-    this.springCoils.push(segment5);
-		
-    // Calculate the dynamic midpoint of the segment for label purposes
-  	var segMidX = function() {return ((this.p1.X() + this.p2.X()) / 2)}.bind(this);
-  	var segMidY = function() {return ((this.p1.Y() + this.p2.Y()) / 2)}.bind(this);
-    var segmidp = board.create('point', [segMidX, segMidY], {visible:false});
-    
-    // The point at the fixed start of the spring
-  	var startp = board.create('point', XY(this.p4), {fixed: true, withLabel: false, visible:false});
-    var springRings = [];
- 	 	var gliderRings = [];
-  	var gliderRingsEven = [];
-  	var gliderRingsOdd = [];
-    
-    for (let i = 0; i < numberOfSpringRings; i++) {
-		let srx, sry;
-    if(this.p1.X() > this.p5.X()) {
-		srx = function(i) {
-		          return function() {
-		            return startp.X() - (i+1) * Math.abs((startp.X() - endp.X()) / 
-                (numberOfSpringRings + 1))	 };}(i);
-                
-     } else {
-     srx = function(i) {
-		          return function() {
-		            return startp.X() + (i+1) * Math.abs((startp.X() - endp.X()) / 
-                (numberOfSpringRings + 1))	 };}(i);
-     
-     }
-		 if(this.p1.Y() > this.p5.Y()) {         
-		sry = function(i) {
-		       return function() {
-		         return startp.Y() - (i+1) * Math.abs((endp.Y() - startp.Y()) / 
-             (numberOfSpringRings+1)) 	};}(i);
-     } else {
-     sry = function(i) {
-		       return function() {
-		         return startp.Y() + (i+1) * Math.abs((endp.Y() - startp.Y()) / 
-             (numberOfSpringRings+1)) 	};}(i);
-     
-     }
-     
-       if (i % 2 === 0) {
-       // Even point, move 1 radius higher
-        //console.log('springRings i X :' + springRings[i].X());	// returns 2, Y returns 8.5
-      gliderRingsEven.push(board.create('glider', [srx, sry, line3], 
-             {fixed: false, visible:false, name:'even'}))
-        
-       } else {
-        // Odd point, move 1 radius lower
-       gliderRingsOdd.push(board.create('glider', [srx, sry, line2], 
-              {fixed:false, visible:false, name:'odd'}))
-       }
-      }
-      
-   // Section to determine how endp connects to final even or odd segments
-   // for even number of spring rings, meaning no. of even gliders = no. of odd gliders
-  if (numberOfSpringRings % 2 === 0) {
-	for (let i = 0; i < gliderRingsEven.length; i++) {
-  const evenRing = gliderRingsEven[i];
-  const oddRing = gliderRingsOdd[i];
-	
-  this.springCoils.push(board.create('segment', [evenRing, oddRing], normalStyle));
-}  
- // Odd point, move 1 y-coordinate lower
- // segments between odd to even gliders
-	for (let i = 0; i < gliderRingsOdd.length-1; i++) {
-      const evenRing = gliderRingsEven[i+1];
-      const oddRing = gliderRingsOdd[i];
-    
-      this.springCoils.push(board.create('segment', [oddRing, evenRing], normalStyle));
-    }                 
-                 
-	// End segment
-	this.springCoils.push(board.create('segment', [gliderRingsOdd[gliderRingsOdd.length-1], endp], normalStyle));
- 
- } else {
-	for (let i = 0; i < gliderRingsEven.length-1; i++) {
-  const evenRing = gliderRingsEven[i];
-  const oddRing = gliderRingsOdd[i];
-  this.springCoils.push(board.create('segment', [evenRing, oddRing], normalStyle));
-}
-      
- // Odd point, move 1 y-coordinate lower
- // segments between odd to even gliders
- for (let i = 0; i < gliderRingsOdd.length; i++) {
-    const evenRing = gliderRingsEven[i+1];
-      const oddRing = gliderRingsOdd[i];
-      this.springCoils.push(board.create('segment', [oddRing, evenRing], normalStyle));
-   }
-                   
-  // End segment
-   this.springCoils.push(board.create('segment', [gliderRingsEven[gliderRingsEven.length-1], endp], normalStyle));
-   }
-  
-  // draw line segments from the ends of the spring to the wall and mass
-  this.springCoils.push(board.create('segment', [startp, gliderRingsEven[0]], normalStyle));
-  
-    // Calculate the dynamic midpoint of the segment for label coordinates
-  	var labelX = function() {return ((this.p1.X() + this.p2.X()) / 2)+this.off}.bind(this);
-  	var labelY = function() {return ((this.p1.Y() + this.p2.Y()) / 2)+this.off}.bind(this);
+    this.dataX = xcoords;
+    this.dataY = ycoords;
+    }    
     // label
-    this.lbl = board.create('point',[labelX, labelY], {    
-      name: toTEX(data[1]),  ...centeredLabelStyle });
-    
-	  // logging
-    console.log("springt", data[1], data[2], data[3], r, pr,  Math.floor(this.n/2), this.off);
+    let labelX = () => x1()+dx()/2-dy()/l2()*(this.off+this.r);
+    let labelY = () => y1()+dy()/2+dx()/l2()*(this.off+this.r);
+    this.lbl = board.create('point', [labelX,labelY], {name: toTEX(data[1]), ...centeredLabelStyle});
+    // logging
+    console.log("springt", data[1], data[2], data[3], this.r, this.pr, Math.floor(this.n/2), this.off);
+    //this.p1.moveTo([4,1], 2000);
     // implement state switching
-    this.obj = [...this.springCoils, this.lbl.label ]; //this.line, 
+    this.obj = [ this.line, this.lbl.label ]; 
     // state init
     if (this.state == "show") { show(this) }
     if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.springCoils, this) }
+    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.line, this) }
     if (this.state == "SHOW") { SHOW(this) }
     if (this.state == "HIDE") { HIDE(this) }
-    // snap points already defined up there
-    this.s = board.create('segment', [this.p1,this.p2],{strokeWidth:0}); 
-    //this.p2.moveTo([7,1], 2000);
+    this.line.setAttribute({highlightFillOpacity:0});
+    this.s = board.create('segment', [this.p1,this.p2],{strokeWidth:0});
     targets.push(this.s);
     this.loads = []
   }
@@ -1849,7 +1722,7 @@ class springt {
   hasPoint(pt) {return (isOn(pt,this.s) || isOn(pt,this.p1)) && 
     JXG.Math.Geometry.distPointLine(
       [1,pt.X(),pt.Y()], this.s.stdform) < tolPointLine} 
-}
+}  
 
 // [ "wall", "name", [x1, y1], [x2,y2] , angle ]
 class wall {
@@ -2009,40 +1882,6 @@ function toSTACK(str) {
   return st
 }
 
-/*
-// new toSTACK function
-function toSTACK(str) {
-  if (str.includes("_")) {
-    let st = str.replace(/\s+/g, "*");
-    let st1 = st.split(/(?<=_*)|(?=_*)/);
-    let st2 = st1.filter(item => item !== "*");
-    let udsIndex = st2.indexOf("_");
-    let udsArray = st2;
-    if (udsIndex !== -1 && udsIndex > 0 && udsIndex < udsArray.length - 1) {
-      const combinedElement = udsArray[udsIndex - 1] + udsArray[udsIndex] + udsArray[udsIndex + 1];
-      udsArray.splice(udsIndex - 1, 3, combinedElement);
-    }
-    const combinedArray = [udsArray.join("*")];
-    str = combinedArray.join("");
-    return str;
-  } else if (str.length === 1 && str !== " ") {
-    console.log("Input string " + str + " will also be the output string.");
-    return str;
-  } else if (str.length > 1 && (/\s\s+/g.test(str) == false)) {
-    if ((str.charAt(0) === str.charAt(0).toUpperCase())) {
-      const modifiedString = str.charAt(0) + "_" + str.slice(1);
-      console.log("New string with underscore is: " + modifiedString);
-      str = modifiedString;
-      return str;
-    }
-  } else if (str === "" || /\s\s+/g.test(str)) {
-    str = "NONAME";
-    return str
-  } else {
-    console.log("Please enter a valid input.")
-  }
-}
-*/
 // toSTACK() test
 //let input = "";
 //let input = "q_0*3a";
