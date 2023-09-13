@@ -53,24 +53,26 @@ JXG.Options.line.highlight = false;
 JXG.Options.polygon.highlight = false;
 JXG.Options.polygon.borders.highlight = false;
 JXG.Options.point.highlight = false;
+
 // Styles
-// nodes (hinges)
-const nodeStyle = { fillcolor: 'white', strokeColor: 'black', size: 2, strokeWidth: 1.5 }; 
-// points (black dots)
-const pointStyle = { fillcolor: 'black', strokeColor: 'black', size: 1, strokeWidth: 1 };
-// invisible points with infobox
-const silentPStyle = {size:0, withLabel:false};
-// grid snap for control points
-const controlSnapStyle = { snapToGrid:true, snapToPoints: true, 
-attractorDistance: 0.2, fixed:false, layer:11};
-// Style for bars
-const barStyle = { strokewidth: 4, strokecolor: "black" };
-// Normal line (body outline)
-const normalStyle = { strokeWidth: 2, strokeColor: 'black', lineCap: 'round' };
-// helper line
-const thinStyle = { strokeWidth: 1, strokeColor: 'black', lineCap: 'round' };
-// hatch style, must be a function because depending on pxunit
-const hatchStyle = function () { return {fixed: true, width:5*pxunit , frequency:5*pxunit, angle:45*deg2rad, layer:8, strokeColor:'black' } };
+const [nodeStyle, pointStyle, silentPStyle, controlSnapStyle, barStyle, normalStyle, thinStyle, hatchStyle] = [
+/* nodes (hinges) */
+{ fillcolor: 'white', strokeColor: 'black', size: 2, strokeWidth: 1.5 },
+/* points (black dots) */
+{ fillcolor: 'black', strokeColor: 'black', size: 1, strokeWidth: 1 },
+/* invisible points with infobox */
+{ size: 0, withLabel: false },
+/* grid snap for control points */
+{ snapToGrid: true, snapToPoints: true, attractorDistance: 0.2, fixed: false, layer: 11 },
+/* Style for bars */
+{ strokewidth: 4, strokecolor: "black" },
+/* Normal line (body outline) */
+{ strokeWidth: 2, strokeColor: 'black', lineCap: 'round' },
+/* helper line */
+{ strokeWidth: 1, strokeColor: 'black', lineCap: 'round' },
+/* hatch style, must be a function because depending on pxunit */
+() => ({ fixed: true, width: 5 * pxunit, frequency: 5 * pxunit, angle: 45 * deg2rad, layer: 8, strokeColor: 'black' })
+];
 
 const board = JXG.JSXGraph.initBoard(divid, {
   boundingbox: [-5, 5, 5, -5], //default values, use "grid" to customize
