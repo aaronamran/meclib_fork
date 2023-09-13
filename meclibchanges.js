@@ -193,7 +193,7 @@ class bar {
 class beam {
  constructor(data){
    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-     else {this.state = "locked"}
+     else {this.state = "SHOW"}
    this.d = data.slice(0); //make a copy
    this.r = data.pop(); // radius
    data.shift(); // drop the type string
@@ -202,54 +202,91 @@ class beam {
    } else {
      this.col = [ 'lightgrey', 'lightgrey']; data.shift(); // drop the name and use default uniform color
    }
-   this.b = board.create('curve', [[],[]], normalStyle); // init the result
    this.p = data; // end points of center line
    // loop over pairs of points
    this.angle = -Math.atan2(this.p[1][1]-this.p[0][1],this.p[1][0]-this.p[0][0])+90*deg2rad;
-   this.attr = { opacity: true, layer: defaultMecLayer, fillcolor:this.col[0],
-     gradient: 'linear', gradientSecondColor: this.col[1], gradientAngle: this.angle, hasInnerPoints:true,
-     ...normalStyle };
-   while (this.p.length > 0) {
-     var x = this.p[0][0];
-     var y =  this.p[0][1];
-     var dx = (this.p[1][0]-x);
-     var dy = (this.p[1][1]-y);
-     var l = Math.sqrt(dx**2+dy**2);
-     var c = this.r/l;
-     var bneu = board.create('curve',[
-       [x+dy*c,x+dx+dy*c,x+dx-dy*c,x-dy*c,x+dy*c], 
-       [y-dx*c,y+dy-dx*c,y+dy+dx*c,y+dx*c,y-dx*c] ], 
-       { strokeWidth:0, hasInnerPoints:true }
-     );
-     // snap points
-     board.create('point',this.p[0], silentPStyle );
-     board.create('point',this.p[1], silentPStyle );
-     if ((typeof JXG.Math.Clip === 'undefined') || (this.b.dataX.length == 0)) {
-        this.b = bneu;
-        this.b.setAttribute(this.attr);
-     }
-     else {
-       this.b = board.create('curve', JXG.Math.Clip.union( bneu, this.b, board), 
-         this.attr);
-     }
-     this.p.shift(); // remove 2 points
-     this.p.shift();
-   } 
+   this.attr = {opacity: true, layer:defaultMecLayer, fillcolor:this.col[0],
+     gradient:'linear', gradientSecondColor:this.col[1], gradientAngle:this.angle, hasInnerPoints:true,
+     ...normalStyle};
+   this.b = board.create('curve', [[],[]], {...normalStyle, hasInnerPoints:true});
+   let beams = [], pointsArray = [], pointNameArray = [], beamUnions = [];
+   let x, y, dx, dy, l , c;
+   console.log('this.p.length is here: ' + this.p.length);
+   // variable names plays a big role, has to be different in every iteration to prevent overriding
+   // previous problem with only 1 beam appearing is due to overwriting of variables
+   // need to use IIFE
+	// Initialize arrays to store function values
+	var xArray = [], yArray = [], dxArray = [], dyArray = [], lArray = [], cArray = [];
+
+   for (let i = 0; i < this.p.length; i+=2) {
+   (function () {
+      var pointName1 = `p${i+1}`, pointName2 = `p${i+2}`, beamName1 = `b${i+1}`;
+      pointNameArray.push(pointName1);
+      pointNameArray.push(pointName2);
+      this[pointName1] = board.create('point', this.p[i], {visible:true, fixed:false, name:pointName1});
+      this[pointName2] = board.create('point', this.p[i+1], {visible:true, fixed:false, name:pointName2});
+      pointsArray.push(this[pointName1]);
+      pointsArray.push(this[pointName2]);
+
+      // Store the function values in arrays
+  		xArray[i] = () => this[pointName1].X();
+  		yArray[i] = () => this[pointName1].Y();
+  		dxArray[i] = () => this[pointName2].X() - this[pointName1].X();
+  		dyArray[i] = () => this[pointName2].Y() - this[pointName1].Y();
+  		lArray[i] = () => Math.sqrt(dxArray[i]()**2 + dyArray[i]()**2);
+  		cArray[i] = () => this.r/lArray[i]();
+
+  		var bneu = board.create('curve', [[],[]], {strokeWidth:0, hasInnerPoints:true});
+  		bneu.updateDataArray = function () {
+    	this.dataX = [xArray[i]()+dyArray[i]()*cArray[i](), xArray[i]()+dxArray[i]()+dyArray[i]()*cArray[i](), xArray[i]()+dxArray[i]()-dyArray[i]()*cArray[i](),
+		      xArray[i]()-dyArray[i]()*cArray[i](), xArray[i]()+dyArray[i]()*cArray[i]()];
+    	this.dataY = [yArray[i]()-dxArray[i]()*cArray[i](), yArray[i]()+dyArray[i]()-dxArray[i]()*cArray[i](), yArray[i]()+dyArray[i]()+dxArray[i]()*cArray[i](), 
+		      yArray[i]()+dxArray[i]()*cArray[i](), yArray[i]()-dxArray[i]()*cArray[i]()];}  
+
+      beams.push(bneu);
+      }).call(this);
+      }
+				
+  	if (this.p.length === 2) {
+        	this.b = beams[0];
+                this.b.setAttribute(this.attr);
+       } else if (this.p.length === 4) {
+       this.b = board.create('curveunion', [beams[0], beams[1]], this.attr); 
+       } else {
+	for (var i = 0; i < beams.length; i += 2) {
+  		if (i + 1 < beams.length) {
+    		let newBeamUnion = board.create('curveunion', [beams[i], beams[i + 1]], this.attr);
+    		beamUnions.push(newBeamUnion);
+  		} else {beamUnions.push(beams[i]);} // If there's an odd number of beams, add the last beam as is
+  		}
+		// Combine the curve unions if there are more than one
+		this.b = board.create('curveunion', beamUnions, this.attr); 
+  		}         
    this.b.rendNode.setAttributeNS(null, 'fill-rule', 'evenodd');  //Workaround for correct fill, see https://github.com/jsxgraph/jsxgraph/issues/362
+  
+    // group points
+    this.b.obj = [this.b];
+    this.b.parent = this;  
+    //const pointgroup = board.create('group', pointsArray); 
+    //const pointgroup = board.create('group', pointsArray).setRotationCenter('centroid').setRotationPoints(pointsArray);
+
     // implement state switching
-    this.obj = [ this.b ];
+    this.obj = [this.b];
+    
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "locked") { makeSwitchable(this.b, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.b, this); break;
+    case 'hide': hide(this); makeSwitchable(this.b, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     this.loads = [];
   }
   hasPoint(pt) {return isOn(pt,this.b)}
   data(){ var a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
 }
+
 // Circle with centerpoint, point on perimeter, optional: use name as radius indicator
 // [ "circle", "name", [xc, yc], [xp,yp] , angle]
 // [ "circle", "name", [xc, yc], radius , angle]
@@ -1709,11 +1746,12 @@ class springt {
     // implement state switching
     this.obj = [ this.line, this.lbl.label ]; 
     // state init
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "SHOW" && this.state != "HIDE") { makeSwitchable(this.line, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.line, this); break;
+    case 'hide': hide(this); makeSwitchable(this.line, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     this.line.setAttribute({highlightFillOpacity:0});
     this.s = board.create('segment', [this.p1,this.p2],{strokeWidth:0});
     targets.push(this.s);
