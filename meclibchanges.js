@@ -1740,7 +1740,7 @@ class springt {
     // end point
     xcoords.push(xf1()+dxf1(), x2());	
     ycoords.push(yf1()+dyf1(), y2());	
-    
+    // update dataX and dataY
     this.dataX = xcoords;
     this.dataY = ycoords;
     }    
@@ -1884,7 +1884,6 @@ function update() {
       catch (err) {console.log(L,T,err.message)}
   } }
    
-  
   // generate output   
   for (m of objects) {
     dfield.push(m.data());
@@ -1900,9 +1899,7 @@ function update() {
     stateInput.dispatchEvent(new Event('change'));
     document.getElementById(fbd_names).value = names;
     document.getElementById(fbd_names).dispatchEvent(new Event('change'))}
-    
 }
-
 
 function cleanUp() {
   // remove deleted objects from the list
