@@ -148,6 +148,7 @@ class angle {
  data() {return this.d}
  name() {return '"'+this.d[1]+'"'}
 }
+
 // Fachwerkstab
 class bar {
  constructor(data) {
@@ -371,6 +372,7 @@ class circle2p {
     mult( this.f, XY(this.A) ), mult( this.f, XY(this.AS) ), this.f] } 
   name(){ return "[["+this.data()[3].toString() + "],[" + this.data()[4].toString() + "]]" } 
 }
+
 // crosshair for reading off co-ordinates from graphs
 // [ "crosshair", "", [x0, y0], [xref, yref], [xscale, yscale], [dpx, dpy] ]
 class crosshair {
@@ -417,6 +419,7 @@ class crosshair {
       ((this.p.Y() - this.p.ref[1]) * this.p.scale[1]).toString() +"]"
   }
 }
+
 // damper 
 // [ "dashpot", "name", [x1,y1], [x2,y2], r, offset ]
 class dashpot {
@@ -593,6 +596,7 @@ class dir {
  data() { return this.d } 
  name() { return '"'+this.d[1]+'"' }
 }
+
 //co-ordinate arrow with red arrow with label 
 // [ "disp", "name", [x,y], angle, offset, length]
 class disp {
@@ -742,7 +746,6 @@ class fix12 {
   hasPoint(pt) {return isOn(pt,this.p1)} 
 }
 
-
 //  Einspannung
 //  [ "fix123", "name", [x, y], angle, state ]	angle = 0, object faces right
 class fix123 {
@@ -798,7 +801,6 @@ class fix123 {
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.p1)} 
 }
-
 
 //  Slider 
 //  [ "fix13", "name", [x, y], angle, state ]
@@ -1117,6 +1119,7 @@ class line {
  data(){ return this.d }
  name(){  return "0" }
 }
+
 //[ "line2P", "label", [x1,y1],[x2,y2], f ]// f is ignored, set scale using "grid"
 //[ "line2P", "label", [x1,y1],[x2,y2], "normal" ]//
 class line2p {
@@ -1150,6 +1153,7 @@ class line2p {
     return ans } 
   name(){ return "[["+this.data()[2].toString() + "],[" + this.data()[3].toString() + "]]" } 
 }
+
 //  point mass [ "mass", [x,y],r, off]
 class mass {
   constructor(data) {
@@ -1166,6 +1170,7 @@ class mass {
   data() { return this.d }
   name(){  return "0" }
 }
+
 class moment {
   constructor(data) {
     this.d = data;
@@ -1210,6 +1215,7 @@ class moment {
   data() { return [this.d[0], this.mname, XY(this.p1), XY(this.p2), XY(this.p3), this.state ]  }
   name() {return toSTACK(this.mname) }
 }
+
 // [ "momentGen", "name", [x,y]]
 class momentGen {
   constructor(data) {
@@ -1280,6 +1286,7 @@ class node {
   data() { return this.d }
   name() { return '"'+this.d[1]+'"' }
 }
+
 //  point with label
 class point {
   constructor(data) {
@@ -1426,6 +1433,7 @@ class q {
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.polygon)} 
 }
+
 // rope, tangent line to two circles ["rope", "name",[x1,y1], r1, [x2,y2],r2 ]
 // negative r values select the tangent point on the left side from the line p1-p2
 class rope {
