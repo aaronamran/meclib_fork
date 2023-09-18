@@ -1678,9 +1678,7 @@ class springt {
     let dy = () => (y2() - y1()); 
     const dx1 = (this.p2.X() - this.p1.X());
     const dy1 = (this.p2.Y() - this.p1.Y());
-    const dxx = () => (this.p2.X() - this.p1.X());
-    const dyy = () => (this.p2.Y() - this.p1.Y());
-    // need two types to solve issue of changing number of turns during animation
+    // need two types of length to solve issue of changing number of turns during animation
     let l1 = Math.sqrt(dx1**2+dy1**2);  
     let l2 = () => Math.sqrt(dx()**2+dy()**2);
     if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
