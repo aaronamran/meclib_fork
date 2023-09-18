@@ -1628,7 +1628,7 @@ class springc {
       xcoords.push(x1()+dx()*j/this.n+dy()*c()*(-1)**j);
       ycoords.push(y1()+dy()*j/this.n-dx()*c()*(-1)**j);
     }
-		// last point
+    // last point
     xcoords.push(x1()+dx()+dy()*c(),x1()+dx()-dy()*c());
     ycoords.push(y1()+dy()-dx()*c(),y1()+dy()+dx()*c());   
     this.dataX = xcoords;
