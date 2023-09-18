@@ -1685,11 +1685,7 @@ class springt {
     if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
     if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}
     if (data.length >7 ) {this.off = data[7]} else {this.off = 14*pxunit}
-    this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve
-    
-    const d0 = Math.sqrt((data[3][0]-data[2][0])**2 + (data[3][1]-data[2][1])**2);
-    const d1 = () => Math.sqrt((this.p2.X()-this.p1.X())**2 + (this.p2.Y()-this.p1.Y())**2);
-    
+    this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve    
     //let c = this.r/l2();
     let xf = () => x1()+this.pr/(100)*dx();		
     let yf = () => y1()+this.pr/(100)*dy();
@@ -1704,7 +1700,7 @@ class springt {
     if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
     if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}
     //console.log('d1 is here: ' + d1());
-    let lf = () => d1()/d0;
+    let lf = () => l2()/l1;
     //console.log('lf is here: ' + lf());
     let xf1 = () => x1()+this.pr/(lf()*100)*dx();		
     let yf1 = () => y1()+this.pr/(lf()*100)*dy();
