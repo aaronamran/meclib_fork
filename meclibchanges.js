@@ -635,21 +635,18 @@ class fix1 {
      [ + 0.8 * a, - 1*a],
      [ 0, - 1.9*a] //label
     ];
-    let p = [], pArr = [], c;
+    let p = [], c;
     for (c of coords) { p.push(board.create('point', c, {visible: false})); }
     const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
     const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
-    t1.applyOnce(pArr);
-    t2.applyOnce(pArr);
     // dependent objects
     // pivot 
     const pointConfigs = {fixed: true, visible: false};
     const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
     {name: '', ...nodeStyle} : pointConfigs));
     [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8] = points;
-    pArr.push(this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.label);
     // label
     this.label = board.create('point', XY(this.p8), {name:toTEX(data[1]), ...centeredLabelStyle });
     // body
@@ -697,21 +694,18 @@ class fix12 {
      [ + 0.8 * a, - a],
      [ 0, - 1.9*a] // label
     ];
-    let p = [], pArr = [], c;
+    let p = [], c;
     for (c of coords) {p.push(board.create('point', c, {visible: false}));}
     const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
     const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
-    t1.applyOnce(pArr);
-    t2.applyOnce(pArr);
     // dependent objects
     // pivot 
     const pointConfigs = {fixed: true, visible: false};
     const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
     {name: '', ...nodeStyle} : pointConfigs));
     [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6] = points;
-    pArr.push(this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.label);
     this.label = board.create('point', XY(this.p6), {name:toTEX(data[1]), ...centeredLabelStyle});
     // body
     this.t = board.create('polygon', [this.p1, this.p2, this.p3], {name:'',fillColor:"white", Opacity:true, layer:7, 
@@ -756,21 +750,18 @@ class fix123 {
      [0, +0.8*a], // p
      [-0.9*a,0]   // label
     ];
-    let p = [], pArr = [], c;
+    let p = [], c;
     for (c of coords) { p.push(board.create('point', c, {visible:false}));}
     const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
     const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
-    t1.applyOnce(pArr);
-    t2.applyOnce(pArr);
     // dependent objects
     // base point
     const pointConfigs = {fixed:true, visible:false};
     const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
     {name: '', ...silentPStyle} : pointConfigs));
     [this.p1, this.p2, this.p3, this.p4] = points;
-    pArr.push(this.p1, this.p2, this.p3, this.p4, this.label);
     // label
     this.label=board.create('point', XY(this.p4), {name:toTEX(data[1]), ...centeredLabelStyle});
     // baseline with hatch
@@ -814,21 +805,18 @@ class fix13 {
      [-0.2*a, +0.8*a], // p
      [-1.1*a,0]   // label
     ];
-    let p = [], pArr = [], c;
+    let p = [], c;
     for (c of coords) { p.push(board.create('point', c, {visible:false}));}
     const t1 = board.create('transform', [data[3]*deg2rad], {type:'rotate'});
     const t2 = board.create('transform', data[2], {type:'translate'});
     t1.applyOnce(p);
     t2.applyOnce(p);
-    t1.applyOnce(pArr);
-    t2.applyOnce(pArr);
     // dependent objects
     // base point
     const pointConfigs = {fixed: true, visible: false};
     const points = p.map((coord, index) => board.create('point', XY(coord), index === 0 ? 
     {name: '', ...silentPStyle} : pointConfigs));
     [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6] = points;
-    pArr.push(this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.label);
     // label
     this.label=board.create('point', XY(this.p6), {name:toTEX(data[1]), ...centeredLabelStyle});
     this.l = board.create('segment', [this.p2,this.p3], {name: '', ...normalStyle});
