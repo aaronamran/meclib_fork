@@ -1685,12 +1685,14 @@ class springt {
     if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
     if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}
     if (data.length >7 ) {this.off = data[7]} else {this.off = 14*pxunit}
-    this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve    
-    //let c = this.r/l2();
-    let xf = () => x1()+this.pr/(100)*dx();		
-    let yf = () => y1()+this.pr/(100)*dy();
-    let dxf = () => dx() - 2*this.pr/100*dx();
-    let dyf = () => dy() - 2*this.pr/100*dy();
+    this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve
+    
+    let lf = () => l2()/l1;
+    let xf = () => x1()+this.pr/(lf()*100)*dx();		
+    let yf = () => y1()+this.pr/(lf()*100)*dy();
+    let dxf = () => dx() - 2*this.pr/(lf()*100)*dx();
+    let dyf = () => dy() - 2*this.pr/(lf()*100)*dy();
+    const cf = () => this.r/(l2()*(1-this.pr/(lf()*50)));
     
     // Enable springt animation
     this.line.updateDataArray = function() {
@@ -1698,30 +1700,21 @@ class springt {
     // since this.r, this.pr and this.n is used in this function scope, they have to be defined in here too
     if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
     if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
-    if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}
-    //console.log('d1 is here: ' + d1());
-    let lf = () => l2()/l1;
-    //console.log('lf is here: ' + lf());
-    let xf1 = () => x1()+this.pr/(lf()*100)*dx();		
-    let yf1 = () => y1()+this.pr/(lf()*100)*dy();
-    let dxf1 = () => dx() - 2*this.pr/(lf()*100)*dx();
-    let dyf1 = () => dy() - 2*this.pr/(lf()*100)*dy();
-    const cf = () => this.r/(l2()*(1-this.pr/(lf()*50)));
+    if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}    
     // start point
-    xcoords.push(x1(), xf1()); 
-    ycoords.push(y1(), yf1());  
+    xcoords.push(x1(), xf()); 
+    ycoords.push(y1(), yf());  
     // intermediate points
     for (let j = 1; j < (this.n+1); j++) {
-      xcoords.push(xf1()+dxf1()*(j-0.5)/this.n+dyf1()*cf()*(-1)**j);
-      ycoords.push(yf1()+dyf1()*(j-0.5)/this.n-dxf1()*cf()*(-1)**j);
+      xcoords.push(xf()+dxf()*(j-0.5)/this.n+dyf()*cf()*(-1)**j);
+      ycoords.push(yf()+dyf()*(j-0.5)/this.n-dxf()*cf()*(-1)**j);
     }
     // end point
-    xcoords.push(xf1()+dxf1(), x2());	
-    ycoords.push(yf1()+dyf1(), y2());	
-    // update dataX and dataY
+    xcoords.push(xf()+dxf(), x2());	
+    ycoords.push(yf()+dyf(), y2());	
     this.dataX = xcoords;
     this.dataY = ycoords;
-    }    
+    }
     // label
     let labelX = () => x1()+dx()/2-dy()/l2()*(this.off+this.r);
     let labelY = () => y1()+dy()/2+dx()/l2()*(this.off+this.r);
