@@ -1276,8 +1276,7 @@ class polygon{
     constructor(data) {
       let pstyle = {opacity:true, fillcolor:'lightgray', vertices:{size:0, fixed:true}, borders:normalStyle, hasInnerPoints:true}
       // if last argument is a string, use it as state flag and remove from list
-      if (typeof(data[data.length - 1]) == 'string') {this.state = data.pop()} else {this.state = "SHOW"}
-      
+      this.state = typeof data[data.length - 1] === 'string' ? data.pop() : 'SHOW';      
       // data for name()
       this.loads = [];
       this.d = data.slice(0);
@@ -1289,18 +1288,12 @@ class polygon{
       let hasHole = false;
       // Check if the polygon has holes
       if (this.v[0].length > 2) {hasHole = true;}
-      let sumX = 0, sumY = 0;
       // Create dynamic points based on the number of vertices
       for (let i = 0; i < this.v.length; i++) {
       const x = this.v[i][0], y = this.v[i][1];
       this.pArr.push(board.create('point', [x,y], {size:0, visible:true, fixed:false}));
       this[`p${i + 1}`] = this.pArr[i]; // Create dynamic point properties
-      // Update the sum of x-coordinates and y-coordinates
-      sumX += x;
-      sumY += y;
       } 
-      // Calculate the average of x-coordinates and y-coordinates
-      const avgX = sumX/this.v.length, avgY = sumY/this.v.length; 
       // Create polygon
       if (hasHole) {
       this.clines = [];
@@ -1407,7 +1400,7 @@ class q {
 // negative r values select the tangent point on the left side from the line p1-p2
 class rope {
   constructor(data) {
-    if (typeof(data[data.length - 1]) == 'string') {this.state = data.pop()} else {this.state = "SHOW"}
+    this.state = typeof data[data.length - 1] === 'string' ? data.pop() : 'SHOW';
     this.d = data;
     const v = minus(data[4], data[2]);
     //const dx = data[4][0]-data[2][0];
