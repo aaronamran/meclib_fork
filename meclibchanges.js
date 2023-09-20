@@ -18,12 +18,12 @@ const highlightColor = "orange";
 const movableLineColor = "blue";
 const loadColor = "blue";
 const defaultMecLayer = 6;
-var pxunit = 1/40; // is reset by "grid"
-var a = 16*pxunit; // is reset by "grid"
+let pxunit = 1/40; // is reset by "grid"
+let a = 16*pxunit; // is reset by "grid"
 const deg2rad = Math.PI/180, rad2deg = 180/Math.PI;
 const tolPointLine = 0.001;
-var xscale = 1, yscale = 1; // default scale for infobox, can be modified by "grid"
-var dpx = 1, dpy = 1; // default decimal precision for infobox, can be modified by "grid"
+let xscale = 1, yscale = 1; // default scale for infobox, can be modified by "grid"
+let dpx = 1, dpy = 1; // default decimal precision for infobox, can be modified by "grid"
 // infobox settings, further settings after board initiation
 JXG.Options.infobox.layer = defaultMecLayer+5;
 JXG.Options.infobox.strokeColor = 'black';
@@ -82,16 +82,16 @@ const board = JXG.JSXGraph.initBoard(divid, {
   keyboard:{enabled:false} //would spoil textinput in momentGen and forceGen
 });
 
-var state;
-var stateInput;
+let state;
+let stateInput;
 // make infobox optionally relative to a given point (define p.ref to [xref, yref])
 board.infobox.distanceY = 20;
 //board.infobox.setAttribute({highlight:false});
 board.highlightInfobox = function(x, y , el) {
-    var ref = [0,0];
-    var scale = [xscale,yscale];
-    var dp = [dpx,dpy];
-    var lbl = '';
+    let ref = [0,0];
+    let scale = [xscale,yscale];
+    let dp = [dpx,dpy];
+    let lbl = '';
     if (typeof (el.ref) == 'function') {ref = el.ref()} 
     else if (typeof(el.ref) != 'undefined') {ref = el.ref}
     if (typeof (el.scale) != 'undefined') {scale = el.scale}
@@ -184,7 +184,7 @@ class bar {
   }
   hasPoint(pt) { 
    return isOn(pt,this.line) && JXG.Math.Geometry.distPointLine([1,pt.X(),pt.Y()], this.line.stdform) < tolPointLine}
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) }  
 }
 
@@ -215,11 +215,11 @@ class beam {
    // previous problem with only 1 beam appearing is due to overwriting of variables
    // need to use IIFE
 	// Initialize arrays to store function values
-	var xArray = [], yArray = [], dxArray = [], dyArray = [], lArray = [], cArray = [];
+	let xArray = [], yArray = [], dxArray = [], dyArray = [], lArray = [], cArray = [];
 
    for (let i = 0; i < this.p.length; i+=2) {
    (function () {
-      var pointName1 = `p${i+1}`, pointName2 = `p${i+2}`, beamName1 = `b${i+1}`;
+      let pointName1 = `p${i+1}`, pointName2 = `p${i+2}`, beamName1 = `b${i+1}`;
       this[pointName1] = board.create('point', this.p[i], {visible:true, fixed:false, name:pointName1});
       this[pointName2] = board.create('point', this.p[i+1], {visible:true, fixed:false, name:pointName2});
 
@@ -231,7 +231,7 @@ class beam {
   		lArray[i] = () => Math.sqrt(dxArray[i]()**2 + dyArray[i]()**2);
   		cArray[i] = () => this.r/lArray[i]();
 
-  		var bneu = board.create('curve', [[],[]], {strokeWidth:0, hasInnerPoints:true});
+  		let bneu = board.create('curve', [[],[]], {strokeWidth:0, hasInnerPoints:true});
   		bneu.updateDataArray = function () {
     	this.dataX = [xArray[i]()+dyArray[i]()*cArray[i](), xArray[i]()+dxArray[i]()+dyArray[i]()*cArray[i](), xArray[i]()+dxArray[i]()-dyArray[i]()*cArray[i](),
 		      xArray[i]()-dyArray[i]()*cArray[i](), xArray[i]()+dyArray[i]()*cArray[i]()];
@@ -248,7 +248,7 @@ class beam {
        } else if (this.p.length === 4) {
        this.b = board.create('curveunion', [beams[0], beams[1]], this.attr); 
        } else {
-	for (var i = 0; i < beams.length; i += 2) {
+	for (let i = 0; i < beams.length; i += 2) {
   		if (i + 1 < beams.length) {
     		let newBeamUnion = board.create('curveunion', [beams[i], beams[i + 1]], this.attr);
     		beamUnions.push(newBeamUnion);
@@ -278,7 +278,7 @@ class beam {
     this.loads = [];
   }
   hasPoint(pt) {return isOn(pt,this.b)}
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
 }
 
@@ -300,7 +300,7 @@ class circle {
     this.obj = [this.c];
     // arrow and label if name is not empty
     if (data[1] != '') {
-      var dir = 1;
+      let dir = 1;
       if (this.angle < 0) {dir = -1}
       const r = this.c.Radius();
       // console.log(dir);
@@ -327,7 +327,7 @@ class circle {
     this.loads = []
   }
   hasPoint(pt) {return isOn(pt,this.c)} 
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
 }
 
@@ -356,7 +356,7 @@ class circle2p {
       this.int1 = board.create('intersection', [this.MSK1, this.xaxis], iStyle );
       this.int2 = board.create('intersection', [this.MSK2, this.xaxis], iStyle ); 
     }
-    for (var pt of [this.A, this.AS, this.int1, this.int2]) {
+    for (let pt of [this.A, this.AS, this.int1, this.int2]) {
     	pt.scale = [this.f,this.f] }
     this.A.on("up", update );
     this.AS.on("up", update );   
@@ -403,7 +403,7 @@ class crosshair {
     this.p.on("up", update);
   }
   data() {
-    var d = this.d;
+    let d = this.d;
     d[2] = XY(this.p);
     return d
   }
@@ -459,7 +459,7 @@ class dashpot {
     } 
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return (isOn(pt,this.s) || isOn(pt,this.p1))  && 
     JXG.Math.Geometry.distPointLine(
@@ -482,8 +482,8 @@ class dim {
    // p01, p02 are the initial points, p1 and p2 are based on these 2 points, in turn, pv1 and pv2 are based on p1 and p2
    let p01x = this.p01.X(), p01y = this.p01.Y(), p02x = this.p02.X(), p02y = this.p02.Y();
    // perpendicular lines
-   var da = 5*pxunit;
-   var di = da;
+   let da = 5*pxunit;
+   let di = da;
    if (d !=0  ) {di=d}
    if (d<0) {di=d;da=-da}
    let negdivn = mult(-di,vn), posdavn = mult(da, vn);
@@ -571,7 +571,7 @@ class dir {
  constructor(data) {
    this.label = data[1];
    this.d = data;
-   var le = 24*pxunit;
+   let le = 24*pxunit;
    this.dist = data[4] || 10;
    data[5] && (le = data[5]);
    this.dist >= 0 ? (this.name1 = "", this.name2 = toTEX(data[1])) : (this.name2 = "", this.name1 = toTEX(data[1]));
@@ -593,7 +593,7 @@ class disp {
   constructor(data) {
    this.label = data[1];
    this.d = data;
-   var le = 24*pxunit;
+   let le = 24*pxunit;
    this.dist = data[4] || 10;
    data[5] && (le = data[5]);
    this.dist >= 0 ? (this.name1 = "", this.name2 = toTEX(data[1])) : (this.name2 = "", this.name1 = toTEX(data[1]));
@@ -663,7 +663,7 @@ class fix1 {
     // proximity 
     this.loads = []
     }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.p1)} 
 }
@@ -720,7 +720,7 @@ class fix12 {
     // proximity 
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.p1)} 
 }
@@ -772,7 +772,7 @@ class fix123 {
     // proximity 
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.p1)} 
 }
@@ -826,7 +826,7 @@ class fix13 {
     // proximity 
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.p1)} 
 }
@@ -843,8 +843,8 @@ class force {
     if (data[5]) { this.state = data[5] } else { this.state = "locked" }
 	// snap and appearance depending on state
     const labelopts = {offset:[this.off,0], autoPosition:true, color:loadColor};
-    var pstyle = {snapToGrid:false, size:0, fixed:true, snapToPoints:false, label:labelopts};
-    var	hl = false; 
+    let pstyle = {snapToGrid:false, size:0, fixed:true, snapToPoints:false, label:labelopts};
+    let	hl = false; 
     if (this.state == "active") {
 		pstyle = {snapToGrid:true, fixed:false, size:2, snapToPoints:true, 
 		attractors:targets, attractorDistance: 0.2, label:labelopts};
@@ -868,7 +868,7 @@ class force {
     this.p2.infoboxlabel = "Vektor ";
     if (this.state == "silent") {this.p2.setAttribute({showInfobox:false})}
     // dash
-    var d = 0; if (this.state == "dotted") d=2
+    let d = 0; if (this.state == "dotted") d=2
     // arrow version with fixed:false doesn't snap to grid
     //this.vec = board.create('arrow', [this.p1, this.p2], {
     // touchLastPoint: true, fixed:false, snapToGrid:true, lastArrow:{size:5, type:2}, highligh    
@@ -919,7 +919,7 @@ class forceGen {
     const dy = -20*pxunit, dx = 40*pxunit;
     // HTML trick because input.set() doesn't work in the callback
     const fid = divid+"_fname"; // unique ID for html object even if multiple widgets on a page
-    var t = board.create('text', [ data[2][0], data[2][1], 
+    let t = board.create('text', [ data[2][0], data[2][1], 
       '<input type="text" id='+fid+' value="'+data[1]+'" size="1">'], {fixed: true});
     // ref point for checking drag distance
     const ref1 = board.create('point', plus(data[2], [0,dy]), {visible:false});
@@ -930,7 +930,7 @@ class forceGen {
     const p2 = board.create('point', plus(data[2], [dx,dy]), {
       name: toTEX(document.getElementById(fid).value), fixed:false, visible:false, label:{offset:[5,0], visible:true, color:'gray'} });
     p2.addParents(t);
-    var vec = board.create('arrow', [p1, p2], 
+    let vec = board.create('arrow', [p1, p2], 
       { fixed:false, color:'gray',lastArrow:{size:5, type:2}, highlight:true,
       highlightStrokeColor:highlightColor} );
     // callback creates new force object and new name
@@ -944,10 +944,10 @@ class forceGen {
       	objects.push(new force(["force", document.getElementById(fid).value, 
           XY(p1), XY(p2), 10, "active"] ));
         // generate new unique force name
-        var f = [];
-        for (var m of objects) {
+        let f = [];
+        for (let m of objects) {
           if (m.data()[0] == 'force') { f = f.concat(m.data()[1]) } }
-        var i = 1, n = '', found = true;
+        let i = 1, n = '', found = true;
         while (found ) { n = 'F_'+i.toString();  found = f.includes(n);i ++;} 
         document.getElementById(fid).value = n;
         vec.parent.d[1] = n;
@@ -996,11 +996,11 @@ class grid {
     const ymin = data [5];
     const ymax = data [6];
     const pix = data [7];
-    var fx = 1, fy = 1;
+    let fx = 1, fy = 1;
     if (data[8]) {fx = data[8][0]; fy = data[8][1]; xscale = fx; yscale = fy };
     if (data[9]) {dpx = data[9][0]; dpy = data[9][1] };
-    var width = pix*Math.abs(xmax-xmin)	
-    var height = pix*Math.abs(ymax-ymin)	
+    let width = pix*Math.abs(xmax-xmin)	
+    let height = pix*Math.abs(ymax-ymin)	
     // logics of container sizing and grid scaling has changed between 1.2.1 and 1.3.2 and in 2023	
     try {	
       if (stack_js) {	
@@ -1032,17 +1032,17 @@ class grid {
     //labelshift = 0.2*a;
     //if (data[1] || data[2]) {board.removeGrids()};
     // Axes specification
-    var labelopt;
+    let labelopt;
     if (data[1]) { 
       if (xmin<xmax) {labelopt = {position: 'rt', offset: [-5, 12] } } 
       else {labelopt = {position: 'lft', offset: [-5, 12] }}
-      var xaxis = board.create('axis', [[0, 0], [1,0]], 
+      let xaxis = board.create('axis', [[0, 0], [1,0]], 
 	    {name:toTEX(data[1]), withLabel: true, label: labelopt,
         ticks: {generateLabelValue:function(p1,p2) {return ((p1.usrCoords[1]-p2.usrCoords[1])*fx).toFixed(dpx-1)}} });}
     if (data[2]) { 
       if (ymin<ymax) {labelopt = {position: 'rt', offset: [10, 0] } } 
       else {labelopt = {position: 'rt', offset: [10, 0] }}
-   	  var yaxis = board.create('axis', [[0, 0], [0,1]], 
+   	  let yaxis = board.create('axis', [[0, 0], [0,1]], 
 	    {name:toTEX(data[2]), withLabel: true, label: labelopt,
         ticks: {generateLabelValue:function(p1,p2) {return ((p1.usrCoords[2]-p2.usrCoords[2])*fy).toFixed(dpy-1)}} });} 
     // version info
@@ -1103,7 +1103,7 @@ class line2p {
       strokecolor: movableLineColor, strokeWidth:1, 
       highlight:true, highlightStrokeColor:highlightColor, 
       name:data[1],withLabel:true});
-    for (var pt of [this.p1, this.p2]) {	pt.scale = [this.f,this.f] }
+    for (let pt of [this.p1, this.p2]) {	pt.scale = [this.f,this.f] }
     this.p1.on("up", update );
     this.p2.on("up", update );
     // if required, add normal
@@ -1116,7 +1116,7 @@ class line2p {
     }     
   }
   data(){ 
-    var ans = this.d; 
+    let ans = this.d; 
     ans[2] = [this.p1.X()*this.f,this.p1.Y()*this.f];
     ans[3] = [this.p2.X()*this.f,this.p2.Y()*this.f];
     return ans } 
@@ -1144,7 +1144,7 @@ class moment {
     this.d = data;
     this.mname = data[1];
     if (data[5]) { this.state = data[5] } else { this.state = "locked" }
-    var fix = true, size = 0, hl = false;
+    let fix = true, size = 0, hl = false;
     if (this.state == "active") {fix = false; size = 2; hl = true} 
     this.p1 = board.create('point', data[2], {
       name: '', ...controlSnapStyle, fixed:fix, size:size });
@@ -1156,7 +1156,7 @@ class moment {
     this.arc = board.create('minorArc', [this.p1, this.p2, this.p3], {
       fixed: true, strokeWidth: 2, highlight:hl, highlightStrokeColor:highlightColor,
       lastArrow: {type: 2, size: 5 }, strokeColor:loadColor });
-    var g = board.create('group', [this.p1, this.p2, this.p3, this.arc]);
+    let g = board.create('group', [this.p1, this.p2, this.p3, this.arc]);
     g.removeTranslationPoint(this.p2);
     g.removeTranslationPoint(this.p3);
     // delete-function
@@ -1192,7 +1192,7 @@ class momentGen {
     const dy = -5*pxunit, dx = 15*pxunit, dy1 = -20*pxunit;
     // HTML trick because input.set() doesn't work in the callback
     const mid = divid+'m_name';
-    var t = board.create('text', [ data[2][0], data[2][1], 
+    let t = board.create('text', [ data[2][0], data[2][1], 
       '<input type="text" id='+mid+' value="'+data[1]+'" size="1">'], {fixed: true});
     // ref point for checking drag distance and for position reset
     const ref1 = board.create('point', plus(data[2], [dx,dy]), {visible:false});
@@ -1206,7 +1206,7 @@ class momentGen {
     const p3 = board.create('point', plus(data[2], [2*dx,dy1]), {
       name: toTEX(document.getElementById(mid).value), fixed:false, visible:false, label:{offset:[5,0], visible:true, color:'gray'} });
     p2.addParents(t);
-    var arc = board.create('minorArc', [p1, p2, p3], { 
+    let arc = board.create('minorArc', [p1, p2, p3], { 
       fixed:false, strokeColor:'gray', strokeWidth: 2, 
       highlight:true, highlightStrokeColor:highlightColor,
       lastArrow: { type: 2, size: 5}});
@@ -1221,10 +1221,10 @@ class momentGen {
         objects.push(new moment(["moment", document.getElementById(mid).value, 
           XY(p1), XY(p2), XY(p3), "active"] ));
         // generate new unique moment name
-        var f = [];
-        for (var m of objects) {
+        let f = [];
+        for (let m of objects) {
           if (m.data()[0] == 'moment') { f = f.concat(m.data()[1]) } }
-        var i = 1, n = '', found = true;
+        let i = 1, n = '', found = true;
         while (found ) { n = 'M_'+i.toString();  found = f.includes(n);i ++;} 
         document.getElementById(mid).value = n;
         arc.parent.d[1] = n;
@@ -1348,7 +1348,7 @@ class polygon{
       }
     }
     hasPoint(pt) { return isOn(pt, this.p) }
-    data() { var a = this.d.slice(0); a.push(this.state); return a }
+    data() { let a = this.d.slice(0); a.push(this.state); return a }
     name() { return targetName(this) }
   }
 
@@ -1398,7 +1398,7 @@ class q {
     if (this.state == "SHOW") { SHOW(this) }
     if (this.state == "HIDE") { HIDE(this) }
   } 
-  data(){ var a = this.d.slice(0); a[8] = this.state; return a}
+  data(){ let a = this.d.slice(0); a[8] = this.state; return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.polygon)} 
 }
@@ -1448,7 +1448,7 @@ class rope {
     } 
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.l) && JXG.Math.Geometry.distPointLine([1,pt.X(),pt.Y()], this.l.stdform) < tolPointLine} 
 }
@@ -1485,14 +1485,14 @@ class spline {
     this.style = data[7];
     // global coordinates
     this.P = data[2]; // ref point
-    var P1 = plus(this.P, data[3]);
-    var P2 = plus(this.P, data[4]);
-    var PT1 = plus(this.P, data[5]);
-    var PT2 = plus(this.P, data[6]);
-    var B1 = [P1[0], this.P[1]];
-    var B2 = [P2[0], this.P[1]]; 
-    var yStyle = {name: '', fixed: false ,size:6, color:'red',fillOpacity:0, snapToGrid:true};
-    var dyStyle = { name: '', fixed: false, snapToGrid:true }
+    let P1 = plus(this.P, data[3]);
+    let P2 = plus(this.P, data[4]);
+    let PT1 = plus(this.P, data[5]);
+    let PT2 = plus(this.P, data[6]);
+    let B1 = [P1[0], this.P[1]];
+    let B2 = [P2[0], this.P[1]]; 
+    let yStyle = {name: '', fixed: false ,size:6, color:'red',fillOpacity:0, snapToGrid:true};
+    let dyStyle = { name: '', fixed: false, snapToGrid:true }
     if (this.state == "pure") {
       yStyle = {name: '', fixed: true ,size:0, color:'red',fillOpacity:0, snapToGrid:false};
       dyStyle = { name: '', fixed: true, snapToGrid:false }
@@ -1638,7 +1638,7 @@ class springc {
     targets.push(this.s);
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return (isOn(pt,this.s) || isOn(pt,this.p1)) && JXG.Math.Geometry.distPointLine(
   [1,pt.X(),pt.Y()], this.s.stdform) < tolPointLine} 
@@ -1718,7 +1718,7 @@ class springt {
     targets.push(this.s);
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return (isOn(pt,this.s) || isOn(pt,this.p1)) && 
     JXG.Math.Geometry.distPointLine(
@@ -1744,7 +1744,7 @@ class wall {
     } 
     this.loads = []
   }
-  data(){ var a = this.d.slice(0); a.push(this.state); return a}
+  data(){ let a = this.d.slice(0); a.push(this.state); return a}
   name(){ return targetName(this) } 
   hasPoint(pt) {return isOn(pt,this.bl) && 
     JXG.Math.Geometry.distPointLine(
@@ -1760,7 +1760,7 @@ function init() {
       state = JSON.parse(stateInput.value); } else { state = JSON.parse(initstring); }
    } else { state = JSON.parse(initstring) }
   //console.log("OK");
-  var m;
+  let m;
   for (m of state) {
     console.log(m);
     switch (m[0]) {
@@ -1809,9 +1809,9 @@ function update() {
   console.log(stateRef);
   if (!stateRef) { return }
   console.log("update")
-  var m;
-  var dfield = [];
-  var names = "[";
+  let m;
+  let dfield = [];
+  let names = "[";
   // get list of loads and targets 
   const load = [ "force", "moment"];
   const target = ["bar", "beam", "circle", "fix1", "fix12", "fix123", "fix13", "rope",
@@ -1875,7 +1875,7 @@ function dist(a,b) { return Math.sqrt( (a[0]-b[0])**2 + (a[1]-b[1])**2 ) }
 // converts whitespace to stars, avoids empty strings
 // original toSTACK function
 function toSTACK(str) { 
-  var st = str.replace(/\s+/g, "*");
+  let st = str.replace(/\s+/g, "*");
   if (st === "") {st = "NONAME"}
   return st
 }
@@ -1906,7 +1906,7 @@ function cleanupName(str) {
   
   strList.forEach(function(st) {
   console.log("here is st: " + st);
-  var pos = st.search("_") 
+  let pos = st.search("_") 
   if (st.length>1 && pos>1) { 
     // remove underscores at wrong places
     st = st.replace(/_/g, '')
@@ -1927,80 +1927,80 @@ function targetName(obj) {if (obj.loads[0]) {return '['+obj.loads+']'} else {ret
 function hermite(x1,dx,y1,dy,d1,d2) {
   if (!isNaN(d1) && !isNaN(d2)) {
     // cubic spline
-    var c0 = (dx**3*y1+(2*dy+(-d2-d1)*dx)*x1**3+(3*dx*dy+(-d2-2*d1)*dx**2)*x1**2-d1*dx**3*x1)/(dx**3);
-    var c1 = -((6*dy+(-3*d2-3*d1)*dx)*x1**2+(6*dx*dy+(-2*d2-4*d1)*dx**2)*x1-d1*dx**3)/(dx**3);
-    var c2 = ((6*dy+(-3*d2-3*d1)*dx)*x1+3*dx*dy+(-d2-2*d1)*dx**2)/(dx**3);
-    var c3 = -(2*dy+(-d2-d1)*dx)/(dx**3); }
+    let c0 = (dx**3*y1+(2*dy+(-d2-d1)*dx)*x1**3+(3*dx*dy+(-d2-2*d1)*dx**2)*x1**2-d1*dx**3*x1)/(dx**3);
+    let c1 = -((6*dy+(-3*d2-3*d1)*dx)*x1**2+(6*dx*dy+(-2*d2-4*d1)*dx**2)*x1-d1*dx**3)/(dx**3);
+    let c2 = ((6*dy+(-3*d2-3*d1)*dx)*x1+3*dx*dy+(-d2-2*d1)*dx**2)/(dx**3);
+    let c3 = -(2*dy+(-d2-d1)*dx)/(dx**3); }
   if (isNaN(d1) && !isNaN(d2)) {
     // parabola with 2 points and slope at right point
-    var c0 = (dx**2*y1+(d2*dx-dy)*x1**2+(d2*dx**2-2*dx*dy)*x1)/(dx**2);
-    var c1 = ((2*dy-2*d2*dx)*x1+2*dx*dy-d2*dx**2)/(dx**2);
-    var c2 = -(dy-d2*dx)/(dx**2);
-    var c3 = 0;}
+    let c0 = (dx**2*y1+(d2*dx-dy)*x1**2+(d2*dx**2-2*dx*dy)*x1)/(dx**2);
+    let c1 = ((2*dy-2*d2*dx)*x1+2*dx*dy-d2*dx**2)/(dx**2);
+    let c2 = -(dy-d2*dx)/(dx**2);
+    let c3 = 0;}
   if (!isNaN(d1) && isNaN(d2)) {
     // parabola with 2 points and slope at left point
-    var c0 = (dx**2*y1+(dy-d1*dx)*x1**2-d1*dx**2*x1)/(dx**2);
-    var c1 = -((2*dy-2*d1*dx)*x1-d1*dx**2)/(dx**2);
-    var c2 = (dy-d1*dx)/(dx**2);
-    var c3 = 0;}
+    let c0 = (dx**2*y1+(dy-d1*dx)*x1**2-d1*dx**2*x1)/(dx**2);
+    let c1 = -((2*dy-2*d1*dx)*x1-d1*dx**2)/(dx**2);
+    let c2 = (dy-d1*dx)/(dx**2);
+    let c3 = 0;}
   if (isNaN(d1) && isNaN(d2)) {
     // straight segment thru 2 points
-    var c0 = (dx*y1-dy*x1)/dx;
-    var c1 = dy/dx;
-    var c2 = 0;
-    var c3 = 0;}
+    let c0 = (dx*y1-dy*x1)/dx;
+    let c1 = dy/dx;
+    let c2 = 0;
+    let c3 = 0;}
   return [c0, c1, c2, c3];
 }
 function hermiteplot(Ref,p1, p2, t1, t2) {
-  var fct = function(x) {
+  let fct = function(x) {
     const tol = 0.09; // min x-range for tangent lines
-    var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
-    var x1 = p1.X()-Ref[0], dx = p2.X()-p1.X();
-    var y1 = p1.Y()-Ref[1], dy = p2.Y()-p1.Y();
-    var d1 = (p1.Y()-t1.Y())/(p1.X()-t1.X());
+    let c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+    let x1 = p1.X()-Ref[0], dx = p2.X()-p1.X();
+    let y1 = p1.Y()-Ref[1], dy = p2.Y()-p1.Y();
+    let d1 = (p1.Y()-t1.Y())/(p1.X()-t1.X());
     if (Math.abs(p1.X()-t1.X())<tol) {d1 = NaN};
-    var d2 = (p2.Y()-t2.Y())/(p2.X()-t2.X());
+    let d2 = (p2.Y()-t2.Y())/(p2.X()-t2.X());
     if (Math.abs(p2.X()-t2.X())<tol) {d2 = NaN};
-    var c = hermite(x1,dx,y1,dy,d1,d2);
-    var s = Ref[1]+c[3]*(x-Ref[0])**3+c[2]*(x-Ref[0])**2+c[1]*(x-Ref[0])+c[0];
+    let c = hermite(x1,dx,y1,dy,d1,d2);
+    let s = Ref[1]+c[3]*(x-Ref[0])**3+c[2]*(x-Ref[0])**2+c[1]*(x-Ref[0])+c[0];
     return  s
   }
   return fct; 
 };
 function hermitename(Ref,p1, p2, t1, t2) {
   const tol = 0.09; // min x-range for tangent lines
-  var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
-  var x1 = p1.X()-Ref[0], dx = p2.X()-p1.X();
-  var y1 = p1.Y()-Ref[1], dy = p2.Y()-p1.Y();
-  var d1 = (p1.Y()-t1.Y())/(p1.X()-t1.X());
+  let c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+  let x1 = p1.X()-Ref[0], dx = p2.X()-p1.X();
+  let y1 = p1.Y()-Ref[1], dy = p2.Y()-p1.Y();
+  let d1 = (p1.Y()-t1.Y())/(p1.X()-t1.X());
   if (Math.abs(p1.X()-t1.X())<tol) {d1 = NaN};
-  var d2 = (p2.Y()-t2.Y())/(p2.X()-t2.X());
+  let d2 = (p2.Y()-t2.Y())/(p2.X()-t2.X());
   if (Math.abs(p2.X()-t2.X())<tol) {d2 = NaN};
-  var c = hermite(x1,dx,y1,dy,d1,d2);
+  let c = hermite(x1,dx,y1,dy,d1,d2);
   if (!isNaN(c[0]+c[1]+c[2]+c[3])) {
-    var n = c[3].toFixed(5) + "*x^3+" + c[2].toFixed(5) + "*x^2+" + c[1].toFixed(5) + "*x+" + c[0].toFixed(5);
+    let n = c[3].toFixed(5) + "*x^3+" + c[2].toFixed(5) + "*x^2+" + c[1].toFixed(5) + "*x+" + c[0].toFixed(5);
     return n.replace(/\+\-/g,"-")  } 
   else {return "NaN"}
 }
 // functions for state switching
 function lock(ref) {
-        for (var part of ref.obj) {
+        for (let part of ref.obj) {
           part.setAttribute({highlight:false});
         } update()}
 // applies settings for active state of fixed objects
 function show(ref) { ref.state = "show";
-        for (var part of ref.obj) {
+        for (let part of ref.obj) {
           part.setAttribute({strokeOpacity:1, fillOpacity:1});
         } update()}
 // applies settings for inactive state of fixed objects
 function hide(ref) { ref.state = "hide";
-        for (var part of ref.obj) {
+        for (let part of ref.obj) {
           part.setAttribute({strokeOpacity:0.2, fillOpacity:0.2});
         } update()}
         // applies settings for active state of fixed objects with locked property (not highlighted)
 function SHOW(ref) {
     ref.state = "SHOW";
-    for (var part of ref.obj) {
+    for (let part of ref.obj) {
       part.setAttribute({
         strokeOpacity: 1,
         fillOpacity: 1,
@@ -2012,7 +2012,7 @@ function SHOW(ref) {
   // applies settings for inactive state of fixed objects with locked property (not highlighted)
   function HIDE(ref) {
     ref.state = "HIDE";
-    for (var part of ref.obj) {
+    for (let part of ref.obj) {
       part.setAttribute({
         strokeOpacity: 0.2,
         fillOpacity: 0.2,
@@ -2023,7 +2023,7 @@ function SHOW(ref) {
   }
     function hideforce(ref) {
     ref.state = "hideforce";
-    for (var part of ref.obj) {
+    for (let part of ref.obj) {
       part.setAttribute({
         strokeOpacity: 0,
         fillOpacity: 0,
@@ -2034,13 +2034,13 @@ function SHOW(ref) {
   }
   
 function activate(ref) { ref.state = "active";
-        for (var part of ref.obj) {
+        for (let part of ref.obj) {
           part.setAttribute({visible:true});
           part.setAttribute({fixed:false});
           part.setAttribute({snapToGrid:true});
         } update()}
 function deactivate(ref) { ref.state = "inactive";
-        for (var part of ref.obj) {
+        for (let part of ref.obj) {
           part.setAttribute({visible:false});
           part.setAttribute({fixed:true});
         } update()}
@@ -2052,8 +2052,8 @@ function Switch(ref) { switch (ref.state) {
   } console.log(ref.state)}  
 // checks if if a point is outside the boundingbox
 function isOutside(ref) {
-  var [xmin, ymax, xmax, ymin] = board.getBoundingBox();
-  var x = ref.X(), y = ref.Y();
+  let [xmin, ymax, xmax, ymin] = board.getBoundingBox();
+  let x = ref.X(), y = ref.Y();
   return (x<xmin || x>xmax || y<ymin || y>ymax) }
 // sets a state switch callback to element el in object obj
 function makeSwitchable(element, obj) {
@@ -2078,7 +2078,7 @@ for (const el of element) {
 function isNewerVersion (oldVer, newVer) {
 	const oldParts = oldVer.split('.')	
 	const newParts = newVer.split('.')
-	for (var i = 0; i < newParts.length; i++) {
+	for (let i = 0; i < newParts.length; i++) {
 		const a = newParts[i] // parse int
 		const b = oldParts[i] // parse int
 		if (a > b) return true
@@ -2088,7 +2088,7 @@ function isNewerVersion (oldVer, newVer) {
 }
 
 // initialization
-var objects = [];
-var targets = []; // for sliding of points 
+let objects = [];
+let targets = []; // for sliding of points 
 init();
 update();
