@@ -152,8 +152,7 @@ class angle {
 // Fachwerkstab
 class bar {
  constructor(data) {
-   if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-     else {this.state = "locked"}
+   this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
    this.d = data.slice(0);
    // line
    this.p1 = board.create('point',data[2],{withlabel:false, ...nodeStyle, fixed:true});
@@ -193,8 +192,7 @@ class bar {
 // [ "beam", "color", [x1,y1], [x2,y2] ..., radius, state ]
 class beam {
  constructor(data){
-   if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-     else {this.state = "SHOW"}
+   this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
    this.d = data.slice(0); //make a copy
    this.r = data.pop(); // radius
    data.shift(); // drop the type string
@@ -290,8 +288,8 @@ class beam {
 class circle {
   constructor(data){
     this.d = data.slice(0); //make a copy
-    if (data[5]) {this.state = data[5]} else {this.state = "SHOW"}
-    if (data[4]) {this.angle = data[4]*deg2rad} else {this.angle = 0} // pop the angle for the label
+    this.state = data[5] ?? "SHOW";
+    this.angle = data[4] ? data[4] * deg2rad : 0; // pop the angle for the label
     this.p1 = board.create('point', data[2], {visible:true, size:0});
     // specify circle radius - check if data[3] is an array of coordinates or radius from midpoint
     const theta = Math.atan2(this.p1.Y(),this.p1.X());
@@ -421,8 +419,7 @@ class crosshair {
 class dashpot {
   constructor(data){
     // Parameter handling
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "SHOW"}
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data.slice(0); //make a copy
     this.p1 = board.create('point', this.d[2], {name:'p1', fixed:true, visible:false});
     this.p2 = board.create('point', this.d[3], {name:'p2', fixed:true, visible:false});
@@ -573,21 +570,18 @@ class dim {
 class dir {
  constructor(data) {
    this.label = data[1];
-   this.d =data;
+   this.d = data;
    var le = 24*pxunit;
-   if ( data[4] ) { this.dist = data[4] } else {this.dist = 10}
-   if ( data[5] ) { le = data[5] }
-   if (this.dist >= 0) {this.name1 = ""; this.name2 = toTEX(data[1]) } else
-     {this.name2 = ""; this.name1 = toTEX(data[1]) }
+   this.dist = data[4] || 10;
+   data[5] && (le = data[5]);
+   this.dist >= 0 ? (this.name1 = "", this.name2 = toTEX(data[1])) : (this.name2 = "", this.name1 = toTEX(data[1]));
    // Arrow
-   const off = data[4];
+   const off = data[3];
    const v = rect( le, data[3]*deg2rad );
-   this.p1 = board.create('point', data[2], { size: 0, name: this.name1, 
-     showInfobox:false, label:{offset:[0,this.dist], autoPosition:true}});
-   this.p2 = board.create('point', plus(data[2], v), { size: 0, name: this.name2,
-     showInfobox:false, label:{offset:[0,this.dist], autoPosition:true}});
-   this.vec = board.create('arrow', [this.p1, this.p2], { 
-     lastArrow: { type: 1, size: 6 }, ...thinStyle });
+   const pAttr = {fixed:true, size: 0, showInfobox:false, label:{offset:[0,this.dist], autoPosition:true}};
+   this.p1 = board.create('point', data[2], {name: this.name1, ...pAttr});
+   this.p2 = board.create('point', plus(data[2], v), {name: this.name2, ...pAttr});
+   this.vec = board.create('arrow', [this.p1, this.p2], {lastArrow: { type: 1, size: 6 }, ...thinStyle });
  }
  data() { return this.d } 
  name() { return '"'+this.d[1]+'"' }
@@ -598,21 +592,18 @@ class dir {
 class disp {
   constructor(data) {
    this.label = data[1];
-   this.d =data;
+   this.d = data;
    var le = 24*pxunit;
-   if ( data[4] ) { this.dist = data[4] } else {this.dist = 10}
-   if ( data[5] ) { le = data[5] }
-   if (this.dist >= 0) {this.name1 = ""; this.name2 = toTEX(data[1]) } else
-     {this.name2 = ""; this.name1 = toTEX(data[1]) }
+   this.dist = data[4] || 10;
+   data[5] && (le = data[5]);
+   this.dist >= 0 ? (this.name1 = "", this.name2 = toTEX(data[1])) : (this.name2 = "", this.name1 = toTEX(data[1]));
    // Arrow
    const off = data[4];
    const v = rect( le, data[3]*deg2rad );
-   this.p1 = board.create('point', data[2], { size: 0, name: this.name1, 
-     showInfobox:false, label:{offset:[0,this.dist], autoPosition:true, color:"red"}});
-   this.p2 = board.create('point', plus(data[2], v), { size: 0, name: this.name2,
-     showInfobox:false, label:{offset:[0,this.dist], autoPosition:true, color:"red"}});
-   this.vec = board.create('arrow', [this.p1, this.p2], { 
-     lastArrow: { type: 1, size: 6 }, ...thinStyle, strokeColor:"red" });
+   const pAttr = {fixed:true, size:0, showInfobox:false, label:{offset:[0,this.dist], autoPosition:true, color:"red"}};
+   this.p1 = board.create('point', data[2], {name: this.name1, ...pAttr});
+   this.p2 = board.create('point', plus(data[2], v), {name: this.name2, ...pAttr});
+   this.vec = board.create('arrow', [this.p1, this.p2], {lastArrow: { type: 1, size: 6 }, ...thinStyle, strokeColor:"red" });
 }
   data() { return this.d } 
   name() { return '"'+this.d[1]+'"' }
@@ -621,8 +612,7 @@ class disp {
 //  Loslager
 class fix1 {
   constructor(data) {
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-    else {this.state = "SHOW"}
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data.slice(0);
     // base points
     const coords = [
@@ -682,8 +672,7 @@ class fix1 {
 //  [ "fix12", "name", [x, y], angle, state ]
 class fix12 {
   constructor(data) {    
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "SHOW"}
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data.slice(0);
     // base points
     const coords = [
@@ -740,8 +729,7 @@ class fix12 {
 //  [ "fix123", "name", [x, y], angle, state ]	angle = 0, object faces right
 class fix123 {
   constructor(data) {    
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "SHOW"}
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data.slice(0);
     // base points
     const coords = [
@@ -763,7 +751,7 @@ class fix123 {
     {name: '', ...silentPStyle} : pointConfigs));
     [this.p1, this.p2, this.p3, this.p4] = points;
     // label
-    this.label=board.create('point', XY(this.p4), {name:toTEX(data[1]), ...centeredLabelStyle});
+    this.label = board.create('point', XY(this.p4), {name:toTEX(data[1]), ...centeredLabelStyle});
     // baseline with hatch
     this.bl = board.create('segment', [this.p2,this.p3], {name: '',...normalStyle});
     this.c = board.create("comb", [this.p3, this.p2], { ...hatchStyle(), angle:-45*deg2rad})
@@ -793,8 +781,7 @@ class fix123 {
 //  [ "fix13", "name", [x, y], angle, state ]
 class fix13 {
  constructor(data) {
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "SHOW"}
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data.slice(0);
     // base points
     const coords = [
@@ -818,7 +805,7 @@ class fix13 {
     {name: '', ...silentPStyle} : pointConfigs));
     [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6] = points;
     // label
-    this.label=board.create('point', XY(this.p6), {name:toTEX(data[1]), ...centeredLabelStyle});
+    this.label = board.create('point', XY(this.p6), {name:toTEX(data[1]), ...centeredLabelStyle});
     this.l = board.create('segment', [this.p2,this.p3], {name: '', ...normalStyle});
     this.bl = board.create('segment', [this.p4,this.p5], {name: '', ...normalStyle});
     this.c = board.create("comb", [this.p5,this.p4], {...hatchStyle(), angle:-45*deg2rad});
@@ -1070,10 +1057,9 @@ class grid {
 // Text label
 class label {
   constructor(data){
-    if (data[3]) {this.c = data[3]} else {this.c = "black"}
-    this.p1 = board.create('point', data[2], {    
-      name:data[1] ,size:0, label:{offset:[0,0], color:this.c}} );
-    this.d=data;
+    this.c = data[3] ?? "black";
+    this.p1 = board.create('point', data[2], { name:data[1] ,size:0, label:{offset:[0,0], color:this.c}} );
+    this.d = data;
   }
   data(){ return this.d }
   name(){  return "0" }
@@ -1084,19 +1070,18 @@ class label {
 class line {
  constructor(data) {
    this.d = data;
-   if (data[1]) {this.c = data[1]} else {this.c = "black"}
+   this.c = data[1] ? data[1]: "black";
    console.log(this.c)
-   if (data.length<5) {this.dash = "-"} else {this.dash = data[4]}
-   if (data.length<6) {this.th = 0.8 } else {this.th = data[5]}
-   var d;
+   this.dash = data.length >= 5 ? data[4] : "-";
+   this.th = data.length >= 6 ? data[5] : 0.8;
+   let d;
    switch (this.dash) {
      case "-": d = 0; break;
      case ".": d = 1; break;
      case "--": d = 2; break;
      case "-.": d = 6; break;
    }
-   this.p = board.create('curve',[this.d[2],this.d[3]],
-     { dash:d, strokeColor:this.c, strokeWidth:this.th, layer:8}); 
+   this.p = board.create('curve',[this.d[2],this.d[3]], {dash:d, strokeColor:this.c, strokeWidth:this.th, layer:8}); 
    // add to attractor list, to be used by crosshair
    targets.push(this.p);
  }
@@ -1142,9 +1127,8 @@ class line2p {
 class mass {
   constructor(data) {
     this.d = data;
-    var r, off;
-    if (data.length > 3) {r = data[3]} else {r = 4}
-    if (data.length > 4) {off = data[4 ]} else {off = 11}
+    const r = data.length > 3 ? data[3] : 4;
+    const off = data.length > 4 ? data[4] : 11;
     // node
     this.p1 = board.create('point', data[2],  { 
       name:toTEX(data[1]), 
@@ -1260,8 +1244,9 @@ class momentGen {
 class node {
   constructor(data) {
     this.d = data;
-    if (data.length > 3) {this.dist = data[3]} else {this.dist = 10};
-    if (data.length > 4) {this.lc = data[4]; this.fc= data[4]} else {this.lc ="black"; this.fc = "white"};
+    this.dist = data.length > 3 ? data[3] : 10;
+    this.lc = data[4] || "black";
+    this.fc = data[4] || "white";
     // node
     this.p1 = board.create('point', data[2],  {name:toTEX(data[1]), 
       label:{autoPosition:true, offset:[0,this.dist], strokeColor:this.lc}, ...nodeStyle, fillcolor:this.fc} );
@@ -1275,7 +1260,7 @@ class node {
 class point {
   constructor(data) {
     this.d = data;
-    if (data.length > 3) {this.dist = data[3]} else {this.dist = 10};
+    this.dist = data.length > 3 ? data[3] : 10;
     // node
     this.p1 = board.create('point', data[2],  {name:toTEX(data[1]), 
       label:{autoPosition:true, offset:[0,this.dist]}, ...pointStyle} );
@@ -1596,8 +1581,7 @@ class spline {
 // compressive spring, ["springc", "k", [x1,y1], [x2,y2], r, n, off]
 class springc {
   constructor(data){
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "SHOW"}
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data.slice(0); //make a copy
     this.p1 = board.create('point', data[2], {fixed:true, name:'p1', visible:false});
     this.p2 = board.create('point', data[3], {fixed:true, name:'p2', visible:false});
@@ -1606,17 +1590,17 @@ class springc {
     let dx = () => (x2() - x1());
     let dy = () => (y2() - y1());
     let l = () => Math.sqrt(dx()**2+dy()**2);
-    if (data.length > 4) {this.r = data[4]} else {this.r = 6*pxunit}
-    if (data.length > 5) {this.n = data[5]*2+1} else {this.n = Math.ceil(l()/(5*pxunit))}
-    if (data.length > 6) {this.off = data[6]} else {this.off = 14*pxunit}
+    this.r = data.length > 4 ? data[4] : 6*pxunit;
+    this.n = data.length > 5 ? data[5]*2+1 : Math.ceil(l()/(5*pxunit));
+    this.off = data.length > 6 ? data[6] : 14*pxunit;
     this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve
     
     // Enable springc animation
     this.line.updateDataArray = function() {
     let xcoords = [], ycoords = [];
     // since this.r and this.n is used in this function scope, they have to be defined in here too
-    if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
-    if (data.length >5 ) {this.n = data[5]*2+1} else {this.n = Math.ceil(l()/(5*pxunit))}
+    this.r = data.length > 4 ? data[4] : 6*pxunit;
+    this.n = data.length > 5 ? data[5]*2+1 : Math.ceil(l()/(5*pxunit));
     let c = () => this.r/l();
     // ensure this.n (or any other data) is in the correct variable scope
     //console.log('this.n is here: ' + this.n);   // check if number of turns changes during animation
@@ -1665,12 +1649,10 @@ class springc {
 class springt {
   constructor(data){
     // Parameter handling
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "SHOW"}
-   
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data.slice(0); //make a copy
-    this.p1 = board.create('point', data[2], {fixed:false, name:'p1'});
-    this.p2 = board.create('point', data[3], {fixed:false, name:'p2'});
+    this.p1 = board.create('point', data[2], {fixed:false, name:'p1', visible:false});
+    this.p2 = board.create('point', data[3], {fixed:false, name:'p2', visible:false});
     
     let x1 = () => this.p1.X(), y1 = () => this.p1.Y();
     let x2 = () => this.p2.X(), y2 = () => this.p2.Y(); 
@@ -1681,10 +1663,10 @@ class springt {
     // need two types of length to solve issue of changing number of turns during animation
     let l1 = Math.sqrt(dx1**2+dy1**2);  
     let l2 = () => Math.sqrt(dx()**2+dy()**2);
-    if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
-    if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
-    if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}
-    if (data.length >7 ) {this.off = data[7]} else {this.off = 14*pxunit}
+    this.r = data.length > 4 ? data[4] : 6*pxunit;
+    this.pr = data.length > 5 ? data[5] : 20;
+    this.n = data.length > 6 ? data[6]*2+1 : Math.ceil(l1*(1-this.pr/50)/(5*pxunit));
+    this.off = data.length > 7 ? data[7] : 14*pxunit;
     this.line = board.create('curve', [[0],[0]], normalStyle); // init the curve
     
     let lf = () => l2()/l1;
@@ -1698,9 +1680,9 @@ class springt {
     this.line.updateDataArray = function() {
     let xcoords = [], ycoords = [];
     // since this.r, this.pr and this.n is used in this function scope, they have to be defined in here too
-    if (data.length >4 ) {this.r = data[4]} else {this.r = 6*pxunit}
-    if (data.length >5 ) {this.pr = data[5]} else {this.pr = 20}
-    if (data.length >6 ) {this.n = data[6]*2+1} else {this.n = Math.ceil(l1*(1-this.pr/50)/(5*pxunit))}    
+    this.r = data.length > 4 ? data[4] : 6*pxunit;
+    this.pr = data.length > 5 ? data[5] : 20;
+    this.n = data.length > 6 ? data[6]*2+1 : Math.ceil(l1*(1-this.pr/50)/(5*pxunit));   
     // start point
     xcoords.push(x1(), xf()); 
     ycoords.push(y1(), yf());  
@@ -1746,8 +1728,7 @@ class springt {
 // [ "wall", "name", [x1, y1], [x2,y2] , angle ]
 class wall {
   constructor(data) {
-    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
-      else {this.state = "locked"}
+    this.state = (typeof data[data.length-1] == 'string') ? data.pop() : "SHOW";
     this.d = data;
     // dependent objects
     this.bl = board.create('segment', [data[2],data[3]], {name: '', ...normalStyle});
@@ -1755,11 +1736,12 @@ class wall {
       ...hatchStyle(), angle: data[4]*deg2rad })
     // state switching
     this.obj = [ this.bl, this.c ]; 
-    if (this.state == "show") { show(this) }
-    if (this.state == "hide") { hide(this) }
-    if (this.state != "locked") { makeSwitchable(this.c, this) }
-    if (this.state == "SHOW") { SHOW(this) }
-    if (this.state == "HIDE") { HIDE(this) }
+    switch (this.state) {
+    case 'show': show(this); makeSwitchable(this.c, this); break;
+    case 'hide': hide(this); makeSwitchable(this.c, this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
+    } 
     this.loads = []
   }
   data(){ var a = this.d.slice(0); a.push(this.state); return a}
