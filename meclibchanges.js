@@ -220,8 +220,8 @@ class beam {
    for (let i = 0; i < this.p.length; i+=2) {
    (function () {
       let pointName1 = `p${i+1}`, pointName2 = `p${i+2}`, beamName1 = `b${i+1}`;
-      this[pointName1] = board.create('point', this.p[i], {visible:true, fixed:false, name:pointName1});
-      this[pointName2] = board.create('point', this.p[i+1], {visible:true, fixed:false, name:pointName2});
+      this[pointName1] = board.create('point', this.p[i], {visible:false, fixed:true, name:pointName1});
+      this[pointName2] = board.create('point', this.p[i+1], {visible:false, fixed:true, name:pointName2});
 
       // Store the function values in arrays
   		xArray[i] = () => this[pointName1].X();
