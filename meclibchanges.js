@@ -298,6 +298,10 @@ class circle {
     // circle
     this.c = board.create('circle', [this.p1,this.p2], {opacity: true, fillcolor:'lightgray', hasInnerPoints:true, strokeWidth: normalStyle.strokeWidth, strokeColor: normalStyle.strokeColor});
     this.obj = [this.c];
+    this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
+    const diffX = this.p1.X() - this.p0.X();
+    const diffY = this.p1.Y() - this.p0.Y();
+    const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
     // arrow and label if name is not empty
     if (data[1] != '') {
       let dir = 1;
@@ -311,12 +315,10 @@ class circle {
       this.p = board.create('point', plus( XY(this.p1), rect(r+dir*24*pxunit, this.angle)),
       {name:toTEX(data[1]), ...centeredLabelStyle});
       this.obj.push( this.a, this.p.label );
+      t1.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p]);
+    } else {
+      t1.bindTo([this.p2, this.c]);
     }
-    this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
-    const diffX = this.p1.X() - this.p0.X();
-    const diffY = this.p1.Y() - this.p0.Y();
-    const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-    t1.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p]);
     // state init
     switch (this.state) {
     case 'show': show(this); makeSwitchable(this.c, this); break;
