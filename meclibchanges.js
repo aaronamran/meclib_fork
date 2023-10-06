@@ -602,9 +602,8 @@ class disp {
    // Arrow
    const off = data[4];
    const v = rect( le, data[3]*deg2rad );
-   const pAttr = {fixed:true, size:0, showInfobox:false, label:{offset:[0,this.dist], autoPosition:true, color:"red"}};
-   this.p1 = board.create('point', data[2], {name: this.name1, ...pAttr});
-   this.p2 = board.create('point', plus(data[2], v), {name: this.name2, ...pAttr});
+   this.p1 = board.create('point', data[2], {name: this.name1, fixed:true, size:0, showInfobox:false, label:{offset:[0,this.dist], autoPosition:true, color:"red"}});
+   this.p2 = board.create('point', plus(data[2], v), {name: this.name2, fixed:true, size:0, showInfobox:false, label:{offset:[0,this.dist], autoPosition:true, color:"red"}});
    this.vec = board.create('arrow', [this.p1, this.p2], {lastArrow: { type: 1, size: 6 }, ...thinStyle, strokeColor:"red" });
 }
   data() { return this.d } 
