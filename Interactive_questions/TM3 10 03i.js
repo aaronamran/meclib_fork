@@ -18,6 +18,7 @@
  ]
 </p>
 
+// JAVASCRIPT CODE
 let b = objects[3]; // beam
 let labelm = objects[4]; 
 let s = objects[5]; // springt
@@ -99,6 +100,7 @@ initdata: [
 ];
 init: stackjson_stringify(initdata);
 
+// JAVASCRIPT CODE
 let b = objects[3]; // beam
 let labelm = objects[4]; 
 let s = objects[5]; // springt
