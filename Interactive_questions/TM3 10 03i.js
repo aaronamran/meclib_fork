@@ -16,6 +16,7 @@
   [ "rot", "\\varphi", [0,0], [0.4, 0.4], [0.2,-0.8] ],
   [ "moment", "M", [0,0], [1.2, 0.6], [1.2,-0.6] ]
  ]
+</p>
 
 let b = objects[3]; // beam
 let labelm = objects[4]; 
