@@ -26,6 +26,7 @@
  ]
 </p>
 
+// JAVASCRIPT CODE
 let cA = objects[3]; // circle A
 let A = objects[9]; // Masse A
 let B = objects[10]; // Masse B
@@ -113,6 +114,7 @@ initdata: [
 ];
 init: stackjson_stringify(float(initdata));
 
+// JAVASCRIPT
 let cA = objects[3]; // circle A
 let A = objects[9]; // Masse A
 let B = objects[10]; // Masse B
