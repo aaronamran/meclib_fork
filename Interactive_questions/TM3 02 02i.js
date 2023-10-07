@@ -1,6 +1,8 @@
 // TM3 02 02i - Interaktive Fräsbahn mit Slider
-// This file only contains the code from Moodle due to few reasons: 
-// The STACK question variables are complicated to be converted into HTML, JSfiddle server was down on 06th October 2023, and the adjustments to the exisitng JavaScript code do not require creation of complex frames
+// This file only contains the code from Moodle due to multiple reasons: 
+// - The conversion of STACK question variables into HTML is complicated (involves random numbers)
+// - JSfiddle server was down on 06th October 2023
+// - Adjustments to the exisitng JavaScript code do not require creation of complex frames
 
 // <<<<<  CODE - IN MOODLE  >>>>>
 
