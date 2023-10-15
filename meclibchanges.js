@@ -1414,124 +1414,92 @@ class rope {
     const r1 = data[3];
     const r2 = data[5];
     const a1 = Math.acos((r1-r2)/le);
-    this.p1 = board.create('point', data[2], {name:'p1', visible:false, fixed:false});
-    this.p2 = board.create('point', data[4], {name:'p2', visible:false, fixed:false});
-    this.pm = board.create('midpoint', [this.p1, this.p2], {name:'pm', visible:false});
-    this.c1 = board.create('circle', [this.p1, r1], {visible:false});
-    this.c2 = board.create('circle', [this.p2, r2], {visible:false});
-    this.cm = board.create('circle', [this.pm, this.p1], {visible:false});
+    // to make it easier to switch between collective visibility of object frames 
+    let vis = {visible:true}; // use spread operator ( ...vis ) for elements with multiple attributes, otherwise just use variable itself
+	  
+    this.p1 = board.create('point', data[2], {name:'p1', ...vis, fixed:false});
+    this.p2 = board.create('point', data[4], {name:'p2', ...vis, fixed:false});
+    this.pm = board.create('midpoint', [this.p1, this.p2], {name:'pm', ...vis});
+    this.c1 = board.create('circle', [this.p1, r1], vis);
+    this.c2 = board.create('circle', [this.p2, r2], vis);
+    this.cm = board.create('circle', [this.pm, this.p1], vis);
+    this.ropeAttr = {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}};
     
     if (Math.abs(r1) > Math.abs(r2)) {
-    	if ((r1 > 0 && r2 >= 0) || (r1 > 0 && r2 < 0)) {
-   	    this.c3 = board.create('circle', [this.p1, function() {return r1 - r2;}], {strokeWidth:'1px', strokeColor:'red', visible:false});
-   	    this.i1 = board.create('intersection', [this.cm, this.c3], {name:'i1', visible:false});
-   	    this.i2 = board.create('otherintersection', [this.cm, this.c3, this.i1], {name:'i2', visible:false});
-   	    this.l1 = board.create('line', [this.p1, this.i2], {visible:false});
-   	    this.segm = board.create('segment', [this.i2, this.p2], {visible:false});
-   	    this.i3 = board.create('intersection', [this.c1, this.l1], {name:'i3', visible:false});
-   	    this.lp = board.create('parallel', [this.i2,this.p2,this.i3], {visible:false});
-   	    this.i4 = board.create('intersection', [this.c2, this.lp], {name:'i4', visible:false});
-   	    this.l = board.create('segment', [this.i3, this.i4], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}});
-   	} else if (r1 < 0 && r2 > 0) {
-   	    this.c3 = board.create('circle', [this.p1, function() {return r1 - r2;}], {strokeWidth:'1px', strokeColor:'red', visible:false});
-   	    this.i1 = board.create('intersection', [this.cm, this.c3], {name:'i1', visible:false});
-   	    this.i2 = board.create('otherintersection', [this.cm, this.c3, this.i1], {name:'i2', visible:false});
-   	    this.l1 = board.create('line', [this.p1, this.i2], {visible:false});
-   	    this.segm = board.create('segment', [this.i2, this.p2], {visible:false});
-   	    this.i3 = board.create('intersection', [this.c1, this.l1], {name:'i3', visible:false});
-   	    this.i4 = board.create('otherintersection', [this.c1, this.l1, this.i3], {name:'i4', visible:false});
-   	    this.lp = board.create('parallel', [this.i2, this.p2, this.i4], {visible:false});
-   	    this.i5 = board.create('intersection', [this.c2, this.lp], {name:'i5', visible:false});
-   	    this.l = board.create('segment', [this.i4, this.i5], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}});
-   	} else if (r1 < 0 && r2 <= 0) {
-   	    this.c3 = board.create('circle', [this.p1, function() {return Math.abs(r1) - Math.abs(r2);}], {strokeWidth:'1px', strokeColor:'red', visible:false});
-   	    this.i1 = board.create('intersection', [this.cm, this.c3], {name:'i1', visible:false});
-   	    this.i2 = board.create('otherintersection', [this.cm, this.c3, this.i1], {name:'i2', visible:false});
-   	    this.l1 = board.create('line', [this.p1, this.i1], {visible:false});
-   	    this.i3 = board.create('intersection', [this.c1, this.l1], {name:'i3', visible:false});
-   	    this.i4 = board.create('otherintersection', [this.c1, this.l1, this.i3], {name:'i4', visible:false});
-   	    this.lp = board.create('parallel', [this.i1, this.p2, this.i4], {visible:false});
-   	    this.i5 = board.create('intersection', [this.c2, this.lp], {name:'i5', visible:false});
-   	    this.l = board.create('segment', [this.i4, this.i5], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+   	    this.c3 = board.create('circle', [this.p1, 
+            function() {return r1 - r2}], {strokeWidth:'1px', strokeColor:'red', ...vis});
+   	    this.i1 = board.create('intersection', [this.cm, this.c3], {name:'i1', ...vis});
+   	    this.i2 = board.create('otherintersection', [this.cm, this.c3, this.i1], {name:'i2', ...vis});
+   	    this.l1 = board.create('line', [this.p1, this.i2], vis);
+            this.l2 = board.create('line', [this.p1, this.i1], vis);
+   	    this.i3 = board.create('intersection', [this.c1, this.l1], {name:'i3', ...vis});
+            this.i31 = board.create('otherintersection', [this.c1, this.l1, this.i3], {name:'i31', ...vis});
+            this.i4 = board.create('intersection', [this.c1, this.l2], {name:'i4', ...vis});
+            this.i41 = board.create('otherintersection', [this.c1, this.l2, this.i4], {name:'i41', ...vis});
+            if (r1 < 0) {
+        	this.lpl = board.create('parallel', [this.i1,this.p2,this.i41], {color:'purple', ...vis});
+   	    	this.lpr = board.create('parallel', [this.i2,this.p2,this.i31], {color:'green', ...vis});
+            } else {
+        	this.lpl = board.create('parallel', [this.i1,this.p2,this.i4], {color:'purple', ...vis});
+   	    	this.lpr = board.create('parallel', [this.i2,this.p2,this.i3], {color:'green', ...vis});
+            }
+   	    this.i5 = board.create('intersection', [this.c2, this.lpr], {name:'i5', ...vis});
+            this.i6 = board.create('intersection', [this.c2, this.lpl], {name:'i6', ...vis});
+            if (r1 > 0) { this.l = board.create('segment', [this.i3, this.i5], this.ropeAttr); } 
+            else { this.l = board.create('segment', [this.i31, this.i5], this.ropeAttr); }      
+   } 
+   else if (Math.abs(r1) < Math.abs(r2)) {
+   	    this.c3 = board.create('circle', [this.p2, 
+   	    function() {return r2 - r1}], {strokeWidth:'1px', strokeColor:'red', ...vis});
+   	    this.i1 = board.create('intersection', [this.cm, this.c3], {name:'i1', ...vis});
+   	    this.i2 = board.create('otherintersection', [this.cm, this.c3, this.i1], {name:'i2', ...vis});
+   	    this.l1 = board.create('line', [this.p2, this.i2], vis);
+   	    this.l2 = board.create('line', [this.p2, this.i1], vis);
+   	    this.i3 = board.create('intersection', [this.c2, this.l1], {name:'i3', ...vis});
+   	    this.i31 = board.create('otherintersection', [this.c2, this.l1, this.i3], {name:'i31', ...vis});
+   	    this.i4 = board.create('intersection', [this.c2, this.l2], {name:'i4', ...vis});
+   	    this.i41 = board.create('otherintersection', [this.c2, this.l2, this.i4], {name:'i41', ...vis});
+   	    if (r2 < 0) {
+   	    	this.lpl = board.create('parallel', [this.i1,this.p1,this.i41], {color:'purple', ...vis});
+   	    	this.lpr = board.create('parallel', [this.i2,this.p1,this.i31], {color:'green', ...vis});
+   	    } else {
+   	    	this.lpl = board.create('parallel', [this.i1,this.p1,this.i4], {color:'purple', ...vis});
+   	    	this.lpr = board.create('parallel', [this.i2,this.p1,this.i3], {color:'green', ...vis});
+   	    }
+   	    this.i5 = board.create('intersection', [this.c1, this.lpr], {name:'i5', ...vis});
+            this.i6 = board.create('intersection', [this.c1, this.lpl], {name:'i6', ...vis});
+   	    if (r2 > 0) { this.l = board.create('segment', [this.i4, this.i6], this.ropeAttr); } 
+   	    else { this.l = board.create('segment', [this.i41, this.i6], this.ropeAttr); }  
    	} 
-    }  
-
-    else if (Math.abs(r1) < Math.abs(r2)) {
-    	if (r1 >= 0 && r2 > 0){
-        this.c3 = board.create('circle', [this.p2, function() {return Math.abs(r2) - Math.abs(r1);}], {strokeWidth:'1px', strokeColor:'red', visible:false});
-        this.i1 = board.create('intersection', [this.c3, this.cm], {name:'i1', visible:false});
-        this.i2 = board.create('otherintersection', [this.c3, this.cm, this.i1], {name:'i2', visible:false});
-        this.l1 = board.create('line', [this.p2, this.i2], {visible:false});
-        this.i3 = board.create('intersection', [this.l1, this.c2], {name:'i3', visible:false}); 
-        this.segm = board.create('segment', [this.p1, this.i2], {visible:false});
-        this.l2 = board.create('parallel', [this.p1, this.i2, this.i3], {visible:false});
-        this.i4 = board.create('intersection', [this.l2, this.c1], {name:'i4', visible:false});
-   	    this.l = board.create('segment', [this.i3, this.i4], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}});
-   	    } else if (r1 >= 0 && r2 < 0) {
-        this.c3 = board.create('circle', [this.p2, function() {return Math.abs(r2) + Math.abs(r1);}], {strokeWidth:'1px', strokeColor:'red', visible:false});
-        this.i1 = board.create('intersection', [this.c3, this.cm], {name:'i1', visible:false});
-        this.segm = board.create('segment', [this.i1, this.p1], {visible:false});
-        this.l1 = board.create('line', [this.p2, this.i1], {visible:false});
-        this.i2 = board.create('intersection', [this.l1, this.c2], {name:'i2', visible:false});
-        this.i3 = board.create('otherintersection', [this.l1, this.c2, this.i2], {name:'i3', visible:false});
-        this.l2 = board.create('parallel', [this.i1, this.p1, this.i3], {visible:false});
-        this.i4 = board.create('intersection', [this.l2, this.c1], {name:'i4', visible:false}); 
-   	    this.l = board.create('segment', [this.i3, this.i4], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}});
-        }
-        else if (r1 < 0 && r2 > 0) {
-        this.c3 = board.create('circle', [this.p2, function() {return Math.abs(r2) + Math.abs(r1);}], {strokeWidth:'1px', strokeColor:'red', visible:false});
-        this.i1 = board.create('intersection', [this.c3, this.cm], {name:'i1', visible:false});
-        this.i2 = board.create('otherintersection', [this.c3, this.cm, this.i1], {name:'i2', visible:false});
-        this.segm = board.create('segment', [this.i2, this.p1], {visible:false});
-        this.l1 = board.create('line', [this.p2, this.i2], {visible:false});
-        this.i3 = board.create('intersection', [this.l1, this.c2], {name:'i3', visible:false});
-        this.i4 = board.create('otherintersection', [this.l1, this.c2, this.i3], {name:'i4', visible:false});
-        this.l2 = board.create('parallel', [this.i2, this.p1, this.i3], {visible:false});
-        this.i5 = board.create('intersection', [this.l2, this.c1], {name:'i5', visible:false}); 
-   	    this.l = board.create('segment', [this.i3, this.i5], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}});
-   	    } else if (r1 < 0 && r2 < 0) {
-   	    this.c3 = board.create('circle', [this.p2, function() {return Math.abs(r2) - Math.abs(r1);}], {strokeWidth:'1px', strokeColor:'red', visible:false});
-   	    this.i1 = board.create('intersection', [this.cm, this.c3], {name:'i1', visible:false});
-   	    this.i2 = board.create('otherintersection', [this.cm, this.c3, this.i1], {name:'i2', visible:false});
-   	    this.l1 = board.create('line', [this.p2, this.i2], {visible:false});
-   	    this.i3 = board.create('intersection', [this.c1, this.cm], {name:'i3', visible:false});
-        this.l2 = board.create('line', [this.p1, this.i3], {visible:false});
-        this.i4 = board.create('intersection', [this.c1, this.l2], {name:'i4', visible:false});
-        this.i5 = board.create('otherintersection', [this.c1, this.l2, this.i4], {name:'i5', visible:false});
-   	    this.i6 = board.create('intersection', [this.c2, this.l1], {name:'i6', visible:false});
-        this.i7 = board.create('otherintersection', [this.c2, this.l1, this.i6], {name:'i7', visible:false});
-   	    this.l = board.create('segment', [this.i4, this.i7], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
-   	    } 
-    } 
    
     else if (Math.abs(r1) == Math.abs(r2)) {
-    if ((r1 > 0 && r2 > 0) || (r1 < 0 && r2 < 0)) {
-    this.l1 = board.create('line', [this.p1, this.p2], {visible:false});
-    this.perp1 = board.create('perpendicular', [this.l1, this.p1], {visible:false});
-    this.i1 = board.create('intersection', [this.c1, this.perp1], {name:'i1', visible:false});
-    this.i2 = board.create('otherintersection', [this.c1, this.perp1, this.i1], {name:'i2', visible:false});
-    this.perp2 = board.create('perpendicular', [this.l1, this.p2], {visible:false});
-    this.i3 = board.create('intersection', [this.c2, this.perp2], {visible:false, name:'i3'});
-    this.i4 = board.create('otherintersection', [this.c2, this.perp2, this.i3], {name:'i4', visible:false});
-    this.l = board.create('segment', [this.i1,this.i3], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
-    } else if (r1 == 0 && r2 == 0) {
-    this.l = board.create('segment', [this.p1, this.p2], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
-    }
-    else {
-    this.i1 = board.create('intersection', [this.c1, this.cm], {name:'i1', visible:false});
-    this.i2 = board.create('otherintersection', [this.c1, this.cm, this.i1], {name:'i2', visible:false});
-    this.mp1 = board.create('midpoint', [this.i1, this.i2], {name:'mp1', visible:false});
-    this.c3 = board.create('circle', [this.pm, this.mp1], {visible:false});
-    this.i3 = board.create('intersection', [this.c1, this.c3], {name:'i3', visible:false});
-    this.i4 = board.create('otherintersection', [this.c1, this.c3, this.i3], {name:'i4', visible:false});
-    this.i5 = board.create('intersection', [this.c2, this.c3], {name:'i5', visible:false});
-    this.i6 = board.create('otherintersection', [this.c2, this.c3, this.i5], {name:'i6', visible:false});
-    if (r1 > 0 && r2 < 0) {
-    this.l = board.create('segment', [this.i3,this.i5], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
-    } else if (r1 < 0 && r2 > 0) {
-    this.l = board.create('segment', [this.i4,this.i6], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
-    }
-    }
+    	    if ((r1 > 0 && r2 > 0) || (r1 < 0 && r2 < 0)) {
+    		this.l1 = board.create('line', [this.p1, this.p2], {visible:false});
+    		this.perp1 = board.create('perpendicular', [this.l1, this.p1], {visible:false});
+    		this.i1 = board.create('intersection', [this.c1, this.perp1], {name:'i1', visible:false});
+    		this.i2 = board.create('otherintersection', [this.c1, this.perp1, this.i1], {name:'i2', visible:false});
+    		this.perp2 = board.create('perpendicular', [this.l1, this.p2], {visible:false});
+    		this.i3 = board.create('intersection', [this.c2, this.perp2], {visible:false, name:'i3'});
+    		this.i4 = board.create('otherintersection', [this.c2, this.perp2, this.i3], {name:'i4', visible:false});
+    		this.l = board.create('segment', [this.i1,this.i3], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    	    } else if (r1 == 0 && r2 == 0) {
+    		this.l = board.create('segment', [this.p1, this.p2], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    	    }
+    	    else {
+    		this.i1 = board.create('intersection', [this.c1, this.cm], {name:'i1', visible:false});
+    		this.i2 = board.create('otherintersection', [this.c1, this.cm, this.i1], {name:'i2', visible:false});
+    		this.mp1 = board.create('midpoint', [this.i1, this.i2], {name:'mp1', visible:false});
+    		this.c3 = board.create('circle', [this.pm, this.mp1], {visible:false});
+    		this.i3 = board.create('intersection', [this.c1, this.c3], {name:'i3', visible:false});
+    		this.i4 = board.create('otherintersection', [this.c1, this.c3, this.i3], {name:'i4', visible:false});
+    		this.i5 = board.create('intersection', [this.c2, this.c3], {name:'i5', visible:false});
+    		this.i6 = board.create('otherintersection', [this.c2, this.c3, this.i5], {name:'i6', visible:false});
+    	    if (r1 > 0 && r2 < 0) {
+    		this.l = board.create('segment', [this.i3,this.i5], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    	    } else if (r1 < 0 && r2 > 0) {
+    		this.l = board.create('segment', [this.i4,this.i6], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    	    }
+    	    }
     } 
     const p1 = plus(data[2], rect(r1, a0-a1));
     const p2 = plus(data[4], rect(r2, a0-a1));
@@ -1543,10 +1511,10 @@ class rope {
     this.obj = [this.l, this.l.label];  
     // state init
     switch (this.state) {
-		case 'show': show(this); makeSwitchable(this.l, this); break;
+    case 'show': show(this); makeSwitchable(this.l, this); break;
     case 'hide': hide(this); makeSwitchable(this.l, this); break;
-  	case 'SHOW': SHOW(this); break;
-  	case 'HIDE': HIDE(this); break;
+    case 'SHOW': SHOW(this); break;
+    case 'HIDE': HIDE(this); break;
     } 
     this.loads = []
   }
