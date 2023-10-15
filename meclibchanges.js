@@ -1415,7 +1415,7 @@ class rope {
     const r2 = data[5];
     const a1 = Math.acos((r1-r2)/le);
     // to make it easier to switch between collective visibility of object frames 
-    let vis = {visible:true}; // use spread operator ( ...vis ) for elements with multiple attributes, otherwise just use variable itself
+    let vis = {visible:false}; // use spread operator ( ...vis ) for elements with multiple attributes, otherwise just use variable itself
 	  
     this.p1 = board.create('point', data[2], {name:'p1', ...vis, fixed:false});
     this.p2 = board.create('point', data[4], {name:'p2', ...vis, fixed:false});
