@@ -304,8 +304,8 @@ class circle {
     const diffX = this.p1.X() - this.p0.X();
     const diffY = this.p1.Y() - this.p0.Y();
     const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-    // arrow and label if name is not empty
-    if (data[1] != '') {
+    // arrow and label if name is not empty or does not contain whitespaces
+    if (data[1].trim() !== "") {
       let dir = 1;
       if (this.angle < 0) {dir = -1}
       const r = this.c.Radius();
