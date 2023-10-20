@@ -171,7 +171,7 @@ class bar {
    this.lc = board.create('circle', [this.mp, r], {visible:false});
    this.int1 = board.create('intersection', [this.perpl, this.lc], {name:'int1', visible:false});
    this.int2 = board.create('otherintersection', [this.perpl, this.lc, this.int1], {visible:false});
-   let x => this.int2.X(), y => this.int2.Y();
+   let x = () => this.int2.X(), y = () => this.int2.Y();
    this.label = board.create('text', [x, y, data[1]], {anchorX:'middle', anchorY:'middle'});
    // implement state switching
    this.obj = [this.p1, this.p2, this.line, this.label];
