@@ -1474,26 +1474,26 @@ class rope {
    
     else if (Math.abs(r1) == Math.abs(r2)) {
     	    if ((r1 > 0 && r2 > 0) || (r1 < 0 && r2 < 0)) {
-    		this.l1 = board.create('line', [this.p1, this.p2], {visible:false});
-    		this.perp1 = board.create('perpendicular', [this.l1, this.p1], {visible:false});
-    		this.i1 = board.create('intersection', [this.c1, this.perp1], {name:'i1', visible:false});
-    		this.i2 = board.create('otherintersection', [this.c1, this.perp1, this.i1], {name:'i2', visible:false});
-    		this.perp2 = board.create('perpendicular', [this.l1, this.p2], {visible:false});
-    		this.i3 = board.create('intersection', [this.c2, this.perp2], {visible:false, name:'i3'});
-    		this.i4 = board.create('otherintersection', [this.c2, this.perp2, this.i3], {name:'i4', visible:false});
+    		this.l1 = board.create('line', [this.p1, this.p2], vis);
+    		this.perp1 = board.create('perpendicular', [this.l1, this.p1], vis);
+    		this.i1 = board.create('intersection', [this.c1, this.perp1], {name:'i1', ...vis});
+    		this.i2 = board.create('otherintersection', [this.c1, this.perp1, this.i1], {name:'i2', ...vis});
+    		this.perp2 = board.create('perpendicular', [this.l1, this.p2], vis);
+    		this.i3 = board.create('intersection', [this.c2, this.perp2], {name:'i3', ...vis});
+    		this.i4 = board.create('otherintersection', [this.c2, this.perp2, this.i3], {name:'i4', ...vis});
     		this.l = board.create('segment', [this.i1,this.i3], this.ropeAttr); 
     	    } else if (r1 == 0 && r2 == 0) {
     		this.l = board.create('segment', [this.p1, this.p2], this.ropeAttr); 
     	    }
     	    else {
-    		this.i1 = board.create('intersection', [this.c1, this.cm], {name:'i1', visible:false});
-    		this.i2 = board.create('otherintersection', [this.c1, this.cm, this.i1], {name:'i2', visible:false});
-    		this.mp1 = board.create('midpoint', [this.i1, this.i2], {name:'mp1', visible:false});
-    		this.c3 = board.create('circle', [this.pm, this.mp1], {visible:false});
-    		this.i3 = board.create('intersection', [this.c1, this.c3], {name:'i3', visible:false});
-    		this.i4 = board.create('otherintersection', [this.c1, this.c3, this.i3], {name:'i4', visible:false});
-    		this.i5 = board.create('intersection', [this.c2, this.c3], {name:'i5', visible:false});
-    		this.i6 = board.create('otherintersection', [this.c2, this.c3, this.i5], {name:'i6', visible:false});
+    		this.i1 = board.create('intersection', [this.c1, this.cm], {name:'i1', ...vis});
+    		this.i2 = board.create('otherintersection', [this.c1, this.cm, this.i1], {name:'i2', ...vis});
+    		this.mp1 = board.create('midpoint', [this.i1, this.i2], {name:'mp1', ...vis});
+    		this.c3 = board.create('circle', [this.pm, this.mp1], vis);
+    		this.i3 = board.create('intersection', [this.c1, this.c3], {name:'i3', ...vis});
+    		this.i4 = board.create('otherintersection', [this.c1, this.c3, this.i3], {name:'i4', ...vis});
+    		this.i5 = board.create('intersection', [this.c2, this.c3], {name:'i5', ...vis});
+    		this.i6 = board.create('otherintersection', [this.c2, this.c3, this.i5], {name:'i6', ...vis});
     	    if (r1 > 0 && r2 < 0) {
     		this.l = board.create('segment', [this.i3,this.i5], this.ropeAttr); 
     	    } else if (r1 < 0 && r2 > 0) {
