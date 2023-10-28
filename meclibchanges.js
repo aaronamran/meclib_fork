@@ -1481,9 +1481,9 @@ class rope {
     		this.perp2 = board.create('perpendicular', [this.l1, this.p2], {visible:false});
     		this.i3 = board.create('intersection', [this.c2, this.perp2], {visible:false, name:'i3'});
     		this.i4 = board.create('otherintersection', [this.c2, this.perp2, this.i3], {name:'i4', visible:false});
-    		this.l = board.create('segment', [this.i1,this.i3], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    		this.l = board.create('segment', [this.i1,this.i3], this.ropeAttr); 
     	    } else if (r1 == 0 && r2 == 0) {
-    		this.l = board.create('segment', [this.p1, this.p2], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    		this.l = board.create('segment', [this.p1, this.p2], this.ropeAttr); 
     	    }
     	    else {
     		this.i1 = board.create('intersection', [this.c1, this.cm], {name:'i1', visible:false});
@@ -1495,9 +1495,9 @@ class rope {
     		this.i5 = board.create('intersection', [this.c2, this.c3], {name:'i5', visible:false});
     		this.i6 = board.create('otherintersection', [this.c2, this.c3, this.i5], {name:'i6', visible:false});
     	    if (r1 > 0 && r2 < 0) {
-    		this.l = board.create('segment', [this.i3,this.i5], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    		this.l = board.create('segment', [this.i3,this.i5], this.ropeAttr); 
     	    } else if (r1 < 0 && r2 > 0) {
-    		this.l = board.create('segment', [this.i4,this.i6], {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}}); 
+    		this.l = board.create('segment', [this.i4,this.i6], this.ropeAttr); 
     	    }
     	    }
     } 
