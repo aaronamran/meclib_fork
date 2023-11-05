@@ -106,27 +106,29 @@ board.highlightInfobox = function(x, y , el) {
 class angle {
  constructor(data) {
    this.d = data.slice(0); //copy
-   // base line		// silentPStyle
+   // base line		
    this.p1 = board.create('point',data[2],{size:0, name:''}); // silentPStyle
    this.p3 = board.create('point',data[3], {size:0, name:''} ); // silentPStyle
-   this.line = board.create('segment', [this.p1, this.p3], {withlabel:false, ...thinStyle });
+   this.l1 = board.create('segment', [this.p1, this.p3], {withlabel:false, ...thinStyle});
    // second line
-   const a0 = this.line.getAngle();
-   const le = this.line.L();
+   const a0 = this.l1.getAngle();
+   const le = this.l1.L();
    const a1 = a0+data[5]*deg2rad;
    this.p2 = board.create('point', plus(XY(this.p1), rect(le,a1) ), {size:0, name:''});	// silentPStyle
    this.l2 = board.create('segment', [this.p1, this.p2], {withlabel:false, ...thinStyle });
    // arc with arrows
    this.p4 = board.create('point', plus( XY(this.p1), rect(data[4],a0) ), {visible:false, name:'p4'}); // silentPStyle
-   console.log('angle p4 is here!! ' + data[4]);
+   this.c1 = board.create('circle', [this.p1, this.p4], {opacity:0.5, visible:false});
+   this.int1 = board.create('intersection', [this.c1, this.l1], {name:'int1', visible:false}); 
+   this.int2 = board.create('intersection', [this.c1, this.l2], {name:'int2', visible:false}); 
    if (data[0] == "angle" ) {
-     this.arc = board.create('minorArc', [this.p1, this.p4, this.p2], 
+     this.arc = board.create('minorArc', [this.p1, this.int1, this.int2], 
        { ...thinStyle } ) }
    if (data[0] == "angle1" ) { 
-     this.arc = board.create('minorArc', [this.p1, this.p4, this.p2], 
+     this.arc = board.create('minorArc', [this.p1, this.int1, this.int2], 
        { ...thinStyle, lastArrow:{type: 1, size: 6}})}
    if (data[0] == "angle2" ) {
-     this.arc = board.create('minorArc', [this.p1, this.p4, this.p2], 
+     this.arc = board.create('minorArc', [this.p1, this.int1, this.int2], 
        { ...thinStyle, firstArrow:{type: 1, size: 6},lastArrow:{type: 1, size: 6}})}
    // label
    const al = (a0+a1)/2; // angular position of label
