@@ -1001,34 +1001,34 @@ class grid {
     const ymin = data [5];
     const ymax = data [6];
     const pix = data [7];
-    let fx = 1, fy = 1;
+    var fx = 1, fy = 1;
     if (data[8]) {fx = data[8][0]; fy = data[8][1]; xscale = fx; yscale = fy };
     if (data[9]) {dpx = data[9][0]; dpy = data[9][1] };
-    let width = pix*Math.abs(xmax-xmin)	
-    let height = pix*Math.abs(ymax-ymin)	
-    // logics of container sizing and grid scaling has changed between 1.2.1 and 1.3.2 and in 2023	
-    try {	
-      if (stack_js) {	
-        // Stack 2023	
-		// JSXGraph box sizing and coordinate system	
-        board.resizeContainer(width, height); 	
-        board.setBoundingBox([xmin, ymax, xmax, ymin ])	
-        // sizing the wrapper div	
-        document.getElementById(divid).parentElement.style.width = width.toFixed(0)+"px";	
-        document.getElementById(divid).parentElement.style.height = height.toFixed(0)+"px";	
-		// sizing the iframe	
-        stack_js.resize_containing_frame((width+3).toFixed(0)+"px", (height+3).toFixed(0)+"px");	
-      }	
-    } catch (error) {	
-      if (error instanceof ReferenceError) {	
-        // older	
-        if (isNewerVersion ('1.3.1', JXG.version)) {	
-          board.resizeContainer(width, height,false,true); 	
-          board.setBoundingBox([xmin, ymax, xmax, ymin ], true)	
-        } else {	
-          board.setBoundingBox([xmin, ymax, xmax, ymin ]);	
-          board.resizeContainer(width, height); 	
-        }	
+    var width = pix*Math.abs(xmax-xmin)
+    var height = pix*Math.abs(ymax-ymin)
+    // logics of container sizing and grid scaling has changed between 1.2.1 and 1.3.2 and in 2023
+    try {
+      if (stack_js) {
+        // Stack 2023
+		// JSXGraph box sizing and coordinate system
+        board.resizeContainer(width, height); 
+        board.setBoundingBox([xmin, ymax, xmax, ymin ])
+        // sizing the wrapper div
+        document.getElementById(divid).parentElement.style.width = width.toFixed(0)+"px";
+        document.getElementById(divid).parentElement.style.height = height.toFixed(0)+"px";
+		// sizing the iframe
+        stack_js.resize_containing_frame((width+3).toFixed(0)+"px", (height+3).toFixed(0)+"px");
+      }
+    } catch (error) {
+      if (error instanceof ReferenceError) {
+        // older
+        if (isNewerVersion ('1.3.1', JXG.version)) {
+          board.resizeContainer(width, height,false,true); 
+          board.setBoundingBox([xmin, ymax, xmax, ymin ], true)
+        } else {
+          board.setBoundingBox([xmin, ymax, xmax, ymin ]);
+          board.resizeContainer(width, height); 
+        }
       }
     }
     // convenience units
@@ -1037,19 +1037,22 @@ class grid {
     //labelshift = 0.2*a;
     //if (data[1] || data[2]) {board.removeGrids()};
     // Axes specification
-    let labelopt;
+    var labelopt;
     if (data[1]) { 
       if (xmin<xmax) {labelopt = {position: 'rt', offset: [-5, 12] } } 
       else {labelopt = {position: 'lft', offset: [-5, 12] }}
-      let xaxis = board.create('axis', [[0, 0], [1,0]], 
-	    {name:toTEX(data[1]), withLabel: true, label: labelopt,
-        ticks: {generateLabelValue:function(p1,p2) {return ((p1.usrCoords[1]-p2.usrCoords[1])*fx).toFixed(dpx-1)}} });}
+      var xaxis = board.create('axis', [[0, 0], [1,0]], 
+	    {name:toTEX(data[1]), withLabel: true, label: labelopt, layer:0,
+        ticks: { layer:0, generateLabelValue:function(p1,p2) {
+	      return ((p1.usrCoords[1]-p2.usrCoords[1])*fx).toFixed(dpx-1)}} });}
     if (data[2]) { 
       if (ymin<ymax) {labelopt = {position: 'rt', offset: [10, 0] } } 
       else {labelopt = {position: 'rt', offset: [10, 0] }}
-   	  let yaxis = board.create('axis', [[0, 0], [0,1]], 
-	    {name:toTEX(data[2]), withLabel: true, label: labelopt,
-        ticks: {generateLabelValue:function(p1,p2) {return ((p1.usrCoords[2]-p2.usrCoords[2])*fy).toFixed(dpy-1)}} });} 
+   	  var yaxis = board.create('axis', [[0, 0], [0,1]], 
+	    {name:toTEX(data[2]), withLabel: true, label: labelopt, layer:0,
+        ticks: { layer:0, generateLabelValue:function(p1,p2) {
+	      return ((p1.usrCoords[2]-p2.usrCoords[2])*fy).toFixed(dpy-1)}} });    
+    } 
     // version info
     this.vs = board.create("text", [xmin + 0.5 * a, ymax - 0.5 * a, versionText], 
       {strokeColor: "lightgray", fixed:true});
