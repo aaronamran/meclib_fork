@@ -1,16 +1,3 @@
-/* 
-Fixed GitHub Issues that are implemented in this JS code: 
-#11 : Option to lock objects in hidden state (bar, beam, circle, dashpot, fix1, fix12, fix123, fix13, polygon, q, rope, springc, springt, wall)
-#12 : Make the beam object clickable
-#13 : Suppress infobox at "rot" points
-#28 : Move "force" by dragging the vector
-#30 : "force": Prevent forces to have zero length
-#35 : Make toStack() more robust (cleanupName())
-#37 : Grid lines to the background
-
-https://github.com/mkraska/meclib/wiki/Moving-objects-by-scripts
-*/
-
 // https://github.com/mkraska/meclib/wiki
 // version info
 const versionText= "JXG "+JXG.version+" Meclib 2023 10 06";
@@ -1428,7 +1415,7 @@ class rope {
     this.c1 = board.create('circle', [this.p1, r1], vis);
     this.c2 = board.create('circle', [this.p2, r2], vis);
     this.cm = board.create('circle', [this.pm, this.p1], vis);
-    this.ropeAttr = {name: data[1], layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}};
+    this.ropeAttr = {name:'', layer: defaultMecLayer, withLabel:true, ...normalStyle, label:{offset:[0,8],autoPosition:false}};
     
     if (Math.abs(r1) > Math.abs(r2)) {
    	    this.c3 = board.create('circle', [this.p1, 
@@ -1506,6 +1493,11 @@ class rope {
     	    }
     	    }
     } 
+    // rope label
+    this.cl = board.create('circle', [this.pm, 0.35], vis);
+    this.ppl = board.create('perpendicular', [this.pm, this.l], vis);
+    this.lbl = board.create('intersection', [this.ppl, this.cl, 1], {name: data[1], size:0});
+	  
     const p1 = plus(data[2], rect(r1, a0-a1));
     const p2 = plus(data[4], rect(r2, a0-a1));
     targets.push(this.l);
