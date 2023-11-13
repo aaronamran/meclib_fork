@@ -840,8 +840,7 @@ class force {
     if (this.state == "active") {
 		pstyle = {snapToGrid:true, fixed:false, size:2, snapToPoints:true, 
 		attractors:targets, attractorDistance: 0.2, label:labelopts};
-		hl = true;
-	}
+		hl = true; }
     // start and end point
     this.p1 = board.create('point', data[2], { name: this.name1, 
       ...controlSnapStyle, ...pstyle }); 
@@ -850,7 +849,7 @@ class force {
       ...controlSnapStyle, ...pstyle });
     console.log('Force Point 2 Coordinates: (' + this.p2.X() + ', ' + this.p2.Y() + ')');
     let forcelength = Math.sqrt(Math.pow(this.p2.X() - this.p1.X(), 2) + Math.pow(this.p2.Y() - this.p1.Y(), 2));
-		console.log('Force Length: ' + forcelength);
+    console.log('Force Length: ' + forcelength);
     
     // configure infobox
     this.p1.dp = [dpx+1,dpy+1];
@@ -860,10 +859,7 @@ class force {
     this.p2.infoboxlabel = "Vektor ";
     if (this.state == "silent") {this.p2.setAttribute({showInfobox:false})}
     // dash
-    let d = 0; if (this.state == "dotted") d=2
-    // arrow version with fixed:false doesn't snap to grid
-    //this.vec = board.create('arrow', [this.p1, this.p2], {
-    // touchLastPoint: true, fixed:false, snapToGrid:true, lastArrow:{size:5, type:2}, highligh    
+    let d = 0; if (this.state == "dotted") d=2  
     this.vec = board.create('arrow', [this.p1, this.p2], {
       touchLastPoint: true, lastArrow:{size:5, type:2}, highlight:hl,
       highlightStrokeColor:highlightColor, strokeColor:loadColor, dash:d});
@@ -877,8 +873,6 @@ class force {
     g.removeTranslationPoint(this.p2);
     // delete-function
     this.vec.lastclick = Date.now(); 
-    //this.vec.on('drag',function() {
-    //  vec.point1.snapToGrid(); vec.point2.snapToGrid()})
     this.vec.on('up', function() {
       if (Date.now()-this.lastclick < 500 && this.parent.state == "active") { 
         this.parent.state = "deleted"; cleanUp();
