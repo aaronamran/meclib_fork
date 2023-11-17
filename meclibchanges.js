@@ -89,25 +89,30 @@ board.highlightInfobox = function(x, y , el) {
     this.infobox.setText( 
         lbl+'('+((parseFloat(x)-ref[0])*scale[0]).toFixed(dp[0]) + ', ' + ((parseFloat(y)-ref[1])*scale[1]).toFixed(dp[1])+ ')')
 };
+
 // angular dimension with a single or double arrow (handles arrow, arrow1 and arrow2)
 class angle {
  constructor(data) {
    this.d = data.slice(0); //copy
    // base line		
-   this.p1 = board.create('point',data[2],{size:0, name:''}); // silentPStyle
-   this.p3 = board.create('point',data[3], {size:0, name:''} ); // silentPStyle
+   this.p1 = board.create('point', data[2], {size:3, name:'p1', fixed:false, visible:false}); 
+   this.p3 = board.create('point', data[3], {size:3, name:'p3', fixed:false, visible:false}); 
+   this.c2 = board.create('circle', [this.p1, this.p3], {opacity:0.5, visible:false});
    this.l1 = board.create('segment', [this.p1, this.p3], {withlabel:false, ...thinStyle});
    // second line
    const a0 = this.l1.getAngle();
+   console.log('here is a0:' + a0);
    const le = this.l1.L();
    const a1 = a0+data[5]*deg2rad;
-   this.p2 = board.create('point', plus(XY(this.p1), rect(le,a1) ), {size:0, name:''});	// silentPStyle
-   this.l2 = board.create('segment', [this.p1, this.p2], {withlabel:false, ...thinStyle });
+   this.ln = board.create('line', [this.p1, plus(XY(this.p1), rect(le,a1))], {withlabel:false, ...thinStyle, straightFirst:true, visible:false});	
+	 this.in2 = board.create('intersection', [this.ln, this.c2], {visible:false});
+   this.p2 = board.create('glider', [this.in2.X(), this.in2.Y(), this.c2], {fixed:false, name:'p2', visible:false});
+	 this.l2 = board.create('segment', [this.p1, this.p2], {withlabel:false, ...thinStyle});
    // arc with arrows
-   this.p4 = board.create('point', plus( XY(this.p1), rect(data[4],a0) ), {visible:false, name:'p4'}); // silentPStyle
+   this.p4 = board.create('point', plus( XY(this.p1), rect(data[4],a0) ), {visible:false, name:'p4'}); 
    this.c1 = board.create('circle', [this.p1, this.p4], {opacity:0.5, visible:false});
    this.int1 = board.create('intersection', [this.c1, this.l1], {name:'int1', visible:false}); 
-   this.int2 = board.create('intersection', [this.c1, this.l2], {name:'int2', visible:false}); 
+   this.int2 = board.create('intersection', [this.c1, this.l2], {name:'int2', visible:false});
    if (data[0] == "angle" ) {
      this.arc = board.create('minorArc', [this.p1, this.int1, this.int2], 
        { ...thinStyle } ) }
@@ -118,23 +123,27 @@ class angle {
      this.arc = board.create('minorArc', [this.p1, this.int1, this.int2], 
        { ...thinStyle, firstArrow:{type: 1, size: 6},lastArrow:{type: 1, size: 6}})}
    // label
+   this.mp = board.create('midpoint', [this.int1, this.int2], {visible:false, name:'mp'});
+   this.bis = board.create('line', [this.mp, this.p1], {visible:false}); //bisector
    const al = (a0+a1)/2; // angular position of label
    if (data[1] == ".") {
      const rl = data[4]*0.6;
-     this.p5 = board.create('point', plus(XY(this.p1), rect(rl,al) ), {
-       name:"" , showInfobox:false, 
-       fillcolor:'black',strokeColor:'black',size:0.5, strokeWidth:0}); 
+     this.pr = board.create('point', plus(XY(this.p1), rect(rl,al)), {visible:false, name:'pr'});
+     this.cl = board.create('circle', [this.p1, this.pr], {strokeColor:'red', opacity:0.5, visible:false} );
+     this.p5 = board.create('intersection', [this.bis, this.cl, 1], { name:"" , showInfobox:false, fillcolor:'black',strokeColor:'black',size:0.5, strokeWidth:0}); 
    }
    else {
      const rl = data[4]+10*pxunit;
-     this.p5 = board.create('point', plus(XY(this.p1), rect(rl,al)), {name:toTEX(data[1]), showInfobox:false, size:0, label:{offset:[-6,0]}}); 
+     this.pr = board.create('point', plus(XY(this.p1), rect(rl,al)), {visible:false, name:'pr'});
+     this.cl = board.create('circle', [this.p1, this.pr], {strokeColor:'red', opacity:0.5, visible:false} );
+     this.p5 = board.create('intersection', [this.bis, this.cl, 1], {name:toTEX(data[1]), showInfobox:false, size:0}); 
    }
     // Enable object animation
-    this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
+    this.p0 = board.create('point', [0,0], {fixed:true, visible:false, name:'p0'});
     const diffX = this.p1.X() - this.p0.X();
     const diffY = this.p1.Y() - this.p0.Y();
     const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-    t1.bindTo([this.p2, this.p3, this.p4, this.p5]);
+    t1.bindTo([this.in2, this.p3, this.p4, this.pr]); 
  }
  data() {return this.d}
  name() {return '"'+this.d[1]+'"'}
