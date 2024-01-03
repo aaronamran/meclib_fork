@@ -287,24 +287,24 @@ class beam {
 // [ "circle", "name", [xc, yc], radius , angle]
 class circle {
   constructor(data){
+    if (typeof(data[data.length-1]) == 'string') {this.state = data.pop()}
+     else {this.state = "SHOW"}
     this.d = data.slice(0); //make a copy
-    this.state = data[5] ?? "SHOW";
-    this.angle = data[4] ? data[4] * deg2rad : 0; // pop the angle for the label
-    this.p1 = board.create('point', data[2], {visible:true, size:0});
+    if (data[4]) {this.angle = data[4]*deg2rad} else {this.angle = 0} // pop the angle for the label
+    this.p1 = board.create('point', data[2], {visible:false, fixed:true});
     // specify circle radius - check if data[3] is an array of coordinates or radius from midpoint
     const theta = Math.atan2(this.p1.Y(),this.p1.X());
     if (typeof(data[3]) == 'number') {this.p2 = board.create('point', [this.p1.X() + data[3] * Math.cos(theta), this.p1.Y() + data[3] * Math.sin(theta)], {visible:false})}
      else {this.p2 = board.create('point', data[3], {visible:false});}
     // circle
-    this.c = board.create('circle', [this.p1,this.p2], {opacity: true, fillcolor:'lightgray', hasInnerPoints:true, strokeWidth: normalStyle.strokeWidth, strokeColor: normalStyle.strokeColor});
+    this.c = board.create('circle', [this.p1,this.p2], {
+      opacity: true, fillcolor:'lightgray', hasInnerPoints:true, 
+      strokeWidth: normalStyle.strokeWidth, 
+      strokeColor: normalStyle.strokeColor});
     this.obj = [this.c];
-    this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
-    const diffX = this.p1.X() - this.p0.X();
-    const diffY = this.p1.Y() - this.p0.Y();
-    const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
-    // arrow and label if name is not empty or does not contain whitespaces
-    if (data[1].trim() !== "") {
-      let dir = 1;
+    // arrow and label if name is not empty
+    if (data[1] != '') {
+      var dir = 1;
       if (this.angle < 0) {dir = -1}
       const r = this.c.Radius();
       // console.log(dir);
@@ -315,21 +315,25 @@ class circle {
       this.p = board.create('point', plus( XY(this.p1), rect(r+dir*24*pxunit, this.angle)),
       {name:toTEX(data[1]), ...centeredLabelStyle});
       this.obj.push( this.a, this.p.label );
-      t1.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p]);
-    } else {
-      t1.bindTo([this.p2, this.c]);
     }
+    this.p0 = board.create('point', [0,0], {fixed:true, visible:false});
+    const diffX = this.p1.X() - this.p0.X();
+		const diffY = this.p1.Y() - this.p0.Y();
+    const t1 = board.create('transform', [() => this.p1.X() - diffX, () => this.p1.Y() - diffY], {type: 'translate'});
+		t1.bindTo(this.p0);
+		const t2 = board.create('transform', [() => this.p0.X(), () => this.p0.Y()], {type: 'translate'});
+		t2.bindTo([this.p2, this.p3, this.p4, this.a, this.c, this.p]); 
     // state init
     switch (this.state) {
-    case 'show': show(this); makeSwitchable(this.c, this); break;
+		case 'show': show(this); makeSwitchable(this.c, this); break;
     case 'hide': hide(this); makeSwitchable(this.c, this); break;
-    case 'SHOW': SHOW(this); break;
-    case 'HIDE': HIDE(this); break;
+  	case 'SHOW': SHOW(this); break;
+  	case 'HIDE': HIDE(this); break;
     } 
     this.loads = []
   }
   hasPoint(pt) {return isOn(pt,this.c)} 
-  data(){ let a = this.d.slice(0); a.push(this.state); return a}
+  data(){ var a = this.d.slice(0); a.push(this.state); return a}  
   name(){ return targetName(this) } 
 }
 
