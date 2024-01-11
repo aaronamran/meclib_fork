@@ -95,22 +95,22 @@ class angle {
  constructor(data) {
    this.d = data.slice(0); //copy
    // base line		
-   this.p1 = board.create('point', data[2], {size:3, name:'p1', fixed:false, visible:true}); 
-   this.p3 = board.create('point', data[3], {size:3, name:'p3', fixed:false, visible:true}); 
-   this.c2 = board.create('circle', [this.p1, this.p3], {opacity:0.5, visible:true});
+   this.p1 = board.create('point', data[2], {size:3, name:'p1', fixed:false, visible:false}); 
+   this.p3 = board.create('point', data[3], {size:3, name:'p3', fixed:false, visible:false}); 
+   this.c2 = board.create('circle', [this.p1, this.p3], {opacity:0.5, visible:false});
    this.l1 = board.create('segment', [this.p1, this.p3], {withlabel:false, ...thinStyle});
    // second line
    const a0 = this.l1.getAngle();
-   console.log('here is a0:' + a0);
+   // console.log('here is a0:' + a0);
    const le = this.l1.L();
    const a1 = a0+data[5]*deg2rad;
    this.ln = board.create('line', [this.p1, plus(XY(this.p1), rect(le,a1))], {withlabel:false, ...thinStyle, straightFirst:true, visible:false});	
 	 this.in2 = board.create('intersection', [this.ln, this.c2], {visible:false});
-   this.p2 = board.create('glider', [this.in2.X(), this.in2.Y(), this.c2], {fixed:false, name:'p2', visible:true});
+   this.p2 = board.create('glider', [this.in2.X(), this.in2.Y(), this.c2], {fixed:false, name:'p2', visible:false});
 	 this.l2 = board.create('segment', [this.p1, this.p2], {withlabel:false, ...thinStyle});
    // arc with arrows
    this.p4 = board.create('point', plus( XY(this.p1), rect(data[4],a0) ), {visible:false, name:'p4'}); 
-   this.c1 = board.create('circle', [this.p1, this.p4], {opacity:0.5, visible:true});
+   this.c1 = board.create('circle', [this.p1, this.p4], {opacity:0.5, visible:false});
    this.int1 = board.create('intersection', [this.c1, this.l1], {name:'int1', visible:false}); 
    this.int2 = board.create('intersection', [this.c1, this.l2], {name:'int2', visible:false});
    if (data[0] == "angle" ) {
@@ -134,7 +134,7 @@ class angle {
      this.bis.setAttribute({visible:false});
      this.arc.setAttribute({visible:false});
      this.i1 = board.create('intersection', [this.bl2, this.c2], {visible:false, size:0});
-     this.p2 = board.create('otherintersection', [this.bl2, this.c2, this.i1], {name:'p2'});
+     this.p2 = board.create('otherintersection', [this.bl2, this.c2, this.i1], {name:'p2', visible:false});
      this.l2 = board.create('segment', [this.p1, this.p2], {withlabel:false, ...thinStyle});
      this.int1 = board.create('intersection', [this.c1, this.bl1], {name:'int1', visible:false}); 
      this.int2 = board.create('intersection', [this.c1, this.bl2], {name:'int2', visible:false});
@@ -144,7 +144,7 @@ class angle {
      this.arc = board.create('minorArc', [this.p1, this.int1, this.int3], { ...thinStyle } );
      const rl = data[4]*0.6;
      this.pr = board.create('point', plus(XY(this.p1), rect(rl,al)), {visible:false, name:'pr'});
-     this.cl = board.create('circle', [this.p1, this.pr], {strokeColor:'red', opacity:0.5, visible:true} );
+     this.cl = board.create('circle', [this.p1, this.pr], {strokeColor:'red', opacity:0.5, visible:false} );
      this.p5 = board.create('intersection', [this.bis, this.cl, 1], { name:"" , showInfobox:false, fillcolor:'black',strokeColor:'black',size:0.5, strokeWidth:0}); 
    }
    else {
